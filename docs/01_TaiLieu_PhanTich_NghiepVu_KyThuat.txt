@@ -1,0 +1,3204 @@
+                              SOLEMATE AUSTRALIA
+     TÀI LIỆU PHÂN TÍCH NGHIỆP VỤ & ĐẶC TẢ HỆ THỐNG
+                    Australian Footwear E-commerce Platform
+
+Phiên bản
+4.0
+Thị trường
+Australia
+Loại hệ thống
+Single-retailer Footwear E-commerce
+Phạm vi chức năng
+40 chức năng nghiệp vụ cốt lõi
+Thanh toán
+Card / PayPal / Afterpay / COD (mô phỏng)
+Mục đích
+Baseline nghiệp vụ - UI - API - Database cho phát triển hệ thống
+
+Tài liệu ưu tiên tiếng Việt; chỉ giữ các thuật ngữ kỹ thuật/field/API cần thiết bằng tiếng Anh.  |  Bản v4.0: bổ sung Sequence Diagram từng chức năng và mapping DB ở mức field.
+
+1. Tổng quan dự án
+SoleMate Australia là website thương mại điện tử bán giày cho thị trường Úc. Hệ thống bao phủ toàn bộ hành trình từ khám phá sản phẩm, quản lý tài khoản, giỏ hàng, checkout, thanh toán, tạo đơn, theo dõi đơn đến các chức năng quản trị sản phẩm, tồn kho, đơn hàng và khuyến mãi.
+Hạng mục
+Mô tả
+Khách hàng mục tiêu
+Người mua giày tại Australia trên desktop/mobile web.
+Tiền tệ
+AUD; giá hiển thị đã bao gồm GST theo cấu hình nội bộ.
+Kênh bán
+Website của một nhà bán lẻ, không phải marketplace.
+Tài khoản
+Guest có thể browse/cart; tài khoản CUSTOMER dùng cho wishlist, address book và lịch sử đơn hàng.
+Thanh toán
+Credit/Debit Card, PayPal, Afterpay và Cash on Delivery ở mức Payment Simulator.
+Admin
+Quản lý product/variant/stock/order/promotion.
+1.1 Mục tiêu nghiệp vụ
+ Tạo trải nghiệm mua giày đầy đủ và hợp lý theo thị trường Australia.
+ Bảo đảm dữ liệu giá, khuyến mãi, stock, payment và order được xác định ở server.
+ Tách rõ trạng thái Order, Payment và Shipment để vận hành dễ hiểu.
+ Cho phép Admin kiểm soát catalog, inventory, fulfilment và promotion mà không thao tác trực tiếp vào database.
+1.2 Phạm vi và ngoài phạm vi
+Hạng mục
+Mô tả
+Trong phạm vi
+Home, Search/PLP/PDP, Account, Wishlist, Cart, Promotion, Checkout, 4 payment methods, Order, Admin Product/Inventory/Order/Promotion.
+Ngoài phạm vi
+Payment gateway thật, đối soát ngân hàng thật, carrier thật, return/refund settlement đầy đủ, loyalty/gift card, marketplace sellers, native mobile app.
+1.3 Vai trò người dùng
+Hạng mục
+Mô tả
+Guest
+Browse, search, filter, xem PDP, dùng cart, checkout theo chính sách guest.
+Customer
+Toàn bộ quyền Guest + Wishlist, Address Book, My Orders, Cancel/Reorder.
+Admin
+Quản trị Product/Variant/Inventory/Order/Promotion.
+1.4 Quy ước trạng thái chính
+Hạng mục
+Mô tả
+Product status
+DRAFT / ACTIVE / INACTIVE
+Order status
+PENDING_PAYMENT / PROCESSING / SHIPPED / DELIVERED / CANCELLED
+Payment status
+INITIATED / PENDING / SUCCESS / DECLINED / PENDING_COLLECTION / PAID
+Shipment status
+PENDING / SHIPPED / DELIVERED
+2. Mục lục
+Mục lục được tổ chức theo module và Mã chức năng để khi trao đổi có thể tham chiếu trực tiếp bằng mã Fxx.
+Khám phá sản phẩm
+ F01 · Trang chủ và điều hướng
+ F02 · Tìm kiếm sản phẩm
+ F03 · Điều hướng danh mục và thương hiệu
+ F04 · Danh sách sản phẩm (PLP)
+ F05 · Lọc, sắp xếp và phân trang
+ F06 · Chi tiết sản phẩm và lựa chọn biến thể
+Tài khoản
+ F07 · Đăng ký tài khoản
+ F08 · Đăng nhập
+ F09 · Đăng xuất
+ F10 · Quên và đặt lại mật khẩu
+ F11 · Quản lý hồ sơ cá nhân
+ F12 · Sổ địa chỉ
+Wishlist & Giỏ hàng
+ F13 · Wishlist
+ F14 · Thêm sản phẩm vào giỏ
+ F15 · Xem giỏ hàng
+ F16 · Cập nhật số lượng trong giỏ
+ F17 · Xóa sản phẩm khỏi giỏ
+ F18 · Áp dụng và gỡ mã khuyến mãi
+Checkout & Thanh toán
+ F19 · Khởi tạo checkout
+ F20 · Nhập địa chỉ giao hàng
+ F21 · Chọn phương thức giao hàng
+ F22 · Chọn phương thức thanh toán
+ F23 · Thanh toán bằng Credit / Debit Card
+ F24 · Thanh toán bằng PayPal
+ F25 · Thanh toán bằng Afterpay
+ F26 · Thanh toán khi nhận hàng (COD)
+ F27 · Review và Place Order
+ F28 · Xác nhận đơn hàng
+Đơn hàng khách hàng
+ F29 · Danh sách đơn hàng của tôi
+ F30 · Chi tiết đơn hàng
+ F31 · Hủy đơn hàng
+ F32 · Mua lại (Buy Again)
+Admin · Sản phẩm & tồn kho
+ F33 · Danh sách và tìm kiếm sản phẩm
+ F34 · Tạo và cập nhật sản phẩm
+ F35 · Quản lý biến thể, SKU và giá
+ F36 · Điều chỉnh tồn kho
+Admin · Đơn hàng
+ F37 · Danh sách và chi tiết đơn hàng
+ F38 · Cập nhật fulfilment, giao hàng và thu COD
+Admin · Khuyến mãi
+ F39 · Danh sách khuyến mãi
+ F40 · Tạo và cập nhật khuyến mãi
+2.1 Danh mục 40 chức năng
+ID
+Module
+Chức năng
+Màn hình chính
+F01
+Khám phá sản phẩm
+Trang chủ và điều hướng
+SC-01_Home
+F02
+Khám phá sản phẩm
+Tìm kiếm sản phẩm
+SC-02_PLP
+F03
+Khám phá sản phẩm
+Điều hướng danh mục và thương hiệu
+SC-01_Home
+F04
+Khám phá sản phẩm
+Danh sách sản phẩm (PLP)
+SC-02_PLP
+F05
+Khám phá sản phẩm
+Lọc, sắp xếp và phân trang
+SC-02_PLP
+F06
+Khám phá sản phẩm
+Chi tiết sản phẩm và lựa chọn biến thể
+SC-03_PDP
+F07
+Tài khoản
+Đăng ký tài khoản
+SC-15_Register
+F08
+Tài khoản
+Đăng nhập
+SC-04_Login
+F09
+Tài khoản
+Đăng xuất
+SC-04_Login
+F10
+Tài khoản
+Quên và đặt lại mật khẩu
+SC-16_ForgotPassword
+F11
+Tài khoản
+Quản lý hồ sơ cá nhân
+SC-17_Profile
+F12
+Tài khoản
+Sổ địa chỉ
+SC-18_AddressBook
+F13
+Wishlist & Giỏ hàng
+Wishlist
+SC-11_Wishlist
+F14
+Wishlist & Giỏ hàng
+Thêm sản phẩm vào giỏ
+SC-03_PDP
+F15
+Wishlist & Giỏ hàng
+Xem giỏ hàng
+SC-05_Cart
+F16
+Wishlist & Giỏ hàng
+Cập nhật số lượng trong giỏ
+SC-05_Cart
+F17
+Wishlist & Giỏ hàng
+Xóa sản phẩm khỏi giỏ
+SC-05_Cart
+F18
+Wishlist & Giỏ hàng
+Áp dụng và gỡ mã khuyến mãi
+SC-05_Cart
+F19
+Checkout & Thanh toán
+Khởi tạo checkout
+SC-06_Shipping
+F20
+Checkout & Thanh toán
+Nhập địa chỉ giao hàng
+SC-06_Shipping
+F21
+Checkout & Thanh toán
+Chọn phương thức giao hàng
+SC-06_Shipping
+F22
+Checkout & Thanh toán
+Chọn phương thức thanh toán
+SC-07_Payment
+F23
+Checkout & Thanh toán
+Thanh toán bằng Credit / Debit Card
+SC-07_Payment
+F24
+Checkout & Thanh toán
+Thanh toán bằng PayPal
+SC-07_Payment
+F25
+Checkout & Thanh toán
+Thanh toán bằng Afterpay
+SC-07_Payment
+F26
+Checkout & Thanh toán
+Thanh toán khi nhận hàng (COD)
+SC-07_Payment
+F27
+Checkout & Thanh toán
+Review và Place Order
+SC-08_Review
+F28
+Checkout & Thanh toán
+Xác nhận đơn hàng
+SC-09_Confirmation
+F29
+Đơn hàng khách hàng
+Danh sách đơn hàng của tôi
+SC-10_MyOrders
+F30
+Đơn hàng khách hàng
+Chi tiết đơn hàng
+SC-19_OrderDetail
+F31
+Đơn hàng khách hàng
+Hủy đơn hàng
+SC-19_OrderDetail
+F32
+Đơn hàng khách hàng
+Mua lại (Buy Again)
+SC-19_OrderDetail
+F33
+Admin · Sản phẩm & tồn kho
+Danh sách và tìm kiếm sản phẩm
+SC-12_AdminProducts
+F34
+Admin · Sản phẩm & tồn kho
+Tạo và cập nhật sản phẩm
+SC-20_AdminProductForm
+F35
+Admin · Sản phẩm & tồn kho
+Quản lý biến thể, SKU và giá
+SC-20_AdminProductForm
+F36
+Admin · Sản phẩm & tồn kho
+Điều chỉnh tồn kho
+SC-12_AdminProducts
+F37
+Admin · Đơn hàng
+Danh sách và chi tiết đơn hàng
+SC-13_AdminOrders
+F38
+Admin · Đơn hàng
+Cập nhật fulfilment, giao hàng và thu COD
+SC-13_AdminOrders
+F39
+Admin · Khuyến mãi
+Danh sách khuyến mãi
+SC-14_AdminPromotions
+F40
+Admin · Khuyến mãi
+Tạo và cập nhật khuyến mãi
+SC-14_AdminPromotions
+3. Kiến trúc và mô hình tổng quan
+
+                        Hình 3.1 · Kiến trúc logic
+
+                  Hình 3.2 · Sitemap / module chức năng
+
+                     Hình 3.3 · State model của Order
+
+                         Hình 3.4 · ERD tổng quan
+3.1 Nguyên tắc kiến trúc
+ Frontend không tự quyết định total, stock, discount, shipping fee hoặc payment success.
+ Mọi thao tác thay đổi dữ liệu quan trọng đi qua REST API và được validate ở server.
+ Place Order là transaction nguyên tử; hoặc tạo đầy đủ order + stock movement hoặc rollback toàn bộ.
+ Order item và shipping address được lưu snapshot để lịch sử không đổi khi catalog/address thay đổi.
+ Raw CVV và full card number không được lưu trong database hoặc log.
+4. Sequence Diagram và luồng xuyên module
+SEQ-01 · Tìm kiếm và xem sản phẩm
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-02 · Tài khoản
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-03 · Giỏ hàng và promotion
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-04 · Checkout
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-05 · Payment Simulator
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-06 · Place Order
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-07 · Lịch sử đơn hàng / cancel / reorder
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-08 · Admin Product & Inventory
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-09 · Admin Order & COD
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+SEQ-10 · Admin Promotion
+
+Đọc từ trên xuống: mỗi mũi tên thể hiện một request/action; dữ liệu chính thức từ server được xác nhận bởi API/DB trước khi Web hiển thị trạng thái cho người dùng.
+5. Đặc tả chi tiết từng chức năng
+Mỗi chức năng dưới đây đều có: mục tiêu, hình màn hình, điều kiện, luồng chính, quy tắc nghiệp vụ, nhánh ngoại lệ, API và bảng dữ liệu liên quan. Các mục được thiết kế để có thể phát triển trực tiếp mà không cần suy đoán thêm về luồng nghiệp vụ.
+5.1 Module · Khám phá sản phẩm
+F01 · Trang chủ và điều hướng
+Mục tiêu: Cung cấp điểm vào hệ thống, menu chính, banner, nhóm sản phẩm nổi bật và trạng thái giỏ hàng.
+
+               Hình F01 · Màn hình tham chiếu: SC-01_Home
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/home
+GET /api/v1/cart/summary
+DB đọc/ghi
+products, brands, categories, carts
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng truy cập / hoặc nhấn logo để về Home.
+2. Web tải cấu hình banner, nhóm sản phẩm và thương hiệu nổi bật.
+3. Header hiển thị menu Men/Women/Kids/Brands/New/Sale, Search, Wishlist, Account và Cart.
+4. Nhấn product card mở đúng Product Detail theo slug.
+Quy tắc nghiệp vụ
+ Chỉ hiển thị sản phẩm ACTIVE.
+ Cart badge lấy từ giỏ hàng đang hoạt động hiện tại.
+ Menu và Search xuất hiện nhất quán trên màn hình khách hàng.
+Nhánh / ngoại lệ cần xử lý
+ Banner hoặc nhóm sản phẩm không có dữ liệu: ẩn block tương ứng.
+ API lỗi: hiển thị phương án dự phòng tối giản, không chặn header/navigation.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+               Sequence F01 · Trang chủ và điều hướng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Chỉ lấy sản phẩm ACTIVE cho các block nổi bật.namevarchar(255) / NOT NULLREADTên sản phẩm. slugvarchar(255) / UQREADSlug. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. brandsiduuid / PKREADID brand. Chỉ hiển thị brand ACTIVE.namevarchar(120) / UQREADTên brand. slugvarchar(140) / UQREADURL slug. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. categoriesiduuid / PKREADID category. Dựng menu/category điều hướng.namevarchar(120) / NOT NULLREADTên. slugvarchar(140) / UQREADSlug. parent_iduuid / FK NULLREADDanh mục cha. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. cartsiduuid / PKREADID giỏ. Lấy giỏ ACTIVE để hiển thị cart badge.user_iduuid / FK NULLREADUser nếu login. session_keyvarchar(120) / NULLREADGuest session. statusvarchar(20) / NOT NULLREADACTIVE/CONVERTED/ABANDONED. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F02 · Tìm kiếm sản phẩm
+Mục tiêu: Cho phép tìm theo tên sản phẩm, thương hiệu hoặc SKU.
+
+                Hình F02 · Màn hình tham chiếu: SC-02_PLP
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/products?q=
+DB đọc/ghi
+products, brands, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng nhập keyword ở Search.
+2. Từ 2 ký tự có thể hiển thị gợi ý; Enter hoặc Search mở trang kết quả.
+3. Backend chuẩn hóa keyword và tìm theo name/brand/SKU.
+4. Kết quả trả về theo phân trang.
+Quy tắc nghiệp vụ
+ Keyword trim khoảng trắng; tìm không phân biệt hoa thường.
+ Không cho truy vấn wildcard trực tiếp từ client.
+ SKU khớp chính xác được ưu tiên cao hơn khớp một phần tên.
+Nhánh / ngoại lệ cần xử lý
+ Keyword rỗng: không submit.
+ Không có kết quả: hiển thị trạng thái không có dữ liệu và gợi ý Clear filters.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                   Sequence F02 · Tìm kiếm sản phẩm
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Tìm theo name và chỉ trả product ACTIVE.namevarchar(255) / NOT NULLREADTên sản phẩm. slugvarchar(255) / UQREADSlug. brand_iduuid / FKREADBrand. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. brandsiduuid / PKREADID brand. Dùng brand name/slug trong điều kiện tìm.namevarchar(120) / UQREADTên brand. slugvarchar(140) / UQREADURL slug. product_variantsiduuid / PKREADID biến thể. SKU exact match có thể ưu tiên; giá/tồn kho phục vụ kết quả.product_iduuid / FKREADSản phẩm. skuvarchar(80) / UQREADSKU. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F03 · Điều hướng danh mục và thương hiệu
+Mục tiêu: Đi tới danh sách sản phẩm theo giới tính/danh mục/brand/campaign.
+
+               Hình F03 · Màn hình tham chiếu: SC-01_Home
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/categories
+GET /api/v1/brands
+GET /api/v1/products
+DB đọc/ghi
+categories, brands, products
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng chọn Men/Women/Kids/Brands/Sale.
+2. Web tạo URL có slug/filter tương ứng.
+3. PLP tải danh sách theo điều kiện đã chọn.
+Quy tắc nghiệp vụ
+ Slug category/brand phải ACTIVE.
+ Deep-link phải hoạt động khi refresh URL.
+Nhánh / ngoại lệ cần xử lý
+ Slug không tồn tại: trả 404 page.
+ Danh mục không còn sản phẩm: hiển thị trạng thái không có dữ liệu.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+        Sequence F03 · Điều hướng danh mục và thương hiệu
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcategoriesiduuid / PKREADID category. Resolve category từ slug và kiểm tra ACTIVE.slugvarchar(140) / UQREADSlug. parent_iduuid / FK NULLREADDanh mục cha. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. brandsiduuid / PKREADID brand. Resolve brand từ slug.slugvarchar(140) / UQREADURL slug. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. productsiduuid / PKREADID sản phẩm. Lọc product thuộc brand/category và còn ACTIVE.brand_iduuid / FKREADBrand. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. product_categoriesproduct_iduuid / PK,FKREADSản phẩm. Liên kết product với category.category_iduuid / PK,FKREADDanh mục. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F04 · Danh sách sản phẩm (PLP)
+Mục tiêu: Hiển thị product card gồm ảnh, tên, brand, giá, sale price, badge và trạng thái hàng.
+
+                Hình F04 · Màn hình tham chiếu: SC-02_PLP
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/products
+DB đọc/ghi
+products, product_variants, product_images
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. PLP nhận filter từ URL.
+2. API trả product list + available variants + primary image.
+3. Web render grid và tổng số kết quả.
+4. Nhấn card mở PDP.
+Quy tắc nghiệp vụ
+ Giá card dùng effective minimum selling price của variant đang bán.
+ Sale badge chỉ hiển thị nếu sale_price hợp lệ.
+ Product hết toàn bộ stock có thể hiển thị Hết hàng theo cấu hình.
+Nhánh / ngoại lệ cần xử lý
+ Ảnh lỗi dùng placeholder.
+ Product vừa bị deactivate: bỏ khỏi lần tải tiếp theo.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                 Sequence F04 · Danh sách sản phẩm (PLP)
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Thông tin product card.brand_iduuid / FKREADBrand. namevarchar(255) / NOT NULLREADTên sản phẩm. slugvarchar(255) / UQREADSlug. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. product_variantsproduct_iduuid / FKREADSản phẩm. Tính effective price và trạng thái còn hàng.pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. product_imagesproduct_iduuid / FKREADSản phẩm. Lấy ảnh đại diện.urltext / NOT NULLREADẢnh. sort_orderint / NOT NULLREADThứ tự. is_primaryboolean / NOT NULLREADẢnh chính. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F05 · Lọc, sắp xếp và phân trang
+Mục tiêu: Thu hẹp danh sách theo brand, size, price, availability và sắp xếp kết quả.
+
+                Hình F05 · Màn hình tham chiếu: SC-02_PLP
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/products?brand=&size=&minPrice=&maxPrice=&sort=&page=
+DB đọc/ghi
+products, product_variants, brands
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Chọn một hoặc nhiều filter.
+2. Mỗi thay đổi cập nhật query string và reload dữ liệu.
+3. Sort áp dụng trên tập dữ liệu sau filter.
+4. Pagination chuyển page nhưng giữ toàn bộ filter/sort.
+Quy tắc nghiệp vụ
+ AND giữa nhóm filter; OR trong cùng một nhóm.
+ minPrice <= maxPrice.
+ Sort price dùng giá bán thực tế.
+Nhánh / ngoại lệ cần xử lý
+ Filter tạo 0 kết quả: trạng thái không có dữ liệu.
+ Page vượt totalPage: đưa về page cuối hoặc page 1 theo quy định.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+              Sequence F05 · Lọc, sắp xếp và phân trang
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Tập product nền sau filter.brand_iduuid / FKREADBrand. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. product_variantsproduct_iduuid / FKREADSản phẩm. Filter size/price/availability và sort theo giá bán thực tế.sizevarchar(30) / NOT NULLREADSize AU. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. brandsiduuid / PKREADID brand. Filter theo brand.slugvarchar(140) / UQREADURL slug. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F06 · Chi tiết sản phẩm và lựa chọn biến thể
+Mục tiêu: Hiển thị nội dung sản phẩm và giải quyết Colour + Size thành một SKU cụ thể.
+
+                Hình F06 · Màn hình tham chiếu: SC-03_PDP
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-01
+API chính
+GET /api/v1/products/{slug}
+DB đọc/ghi
+products, product_variants, product_images
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở PDP theo slug.
+2. API trả product + variants + images.
+3. Người dùng chọn Colour, Size, Qty.
+4. UI cập nhật SKU, price, stock state theo variant.
+Quy tắc nghiệp vụ
+ Out-of-stock size bị disable.
+ Qty tối đa theo min(stock_qty, max_per_line).
+ Không cho Add to Cart nếu chưa resolve được exact variant.
+Nhánh / ngoại lệ cần xử lý
+ Slug không tồn tại/deactivated: 404.
+ Stock thay đổi sau khi mở PDP: Add to Cart phải revalidate phía server.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+     Sequence F06 · Chi tiết sản phẩm và lựa chọn biến thể
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Nội dung PDP.brand_iduuid / FKREADBrand. namevarchar(255) / NOT NULLREADTên sản phẩm. slugvarchar(255) / UQREADSlug. descriptiontext / NULLREADMô tả. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. product_variantsiduuid / PKREADID biến thể. Resolve Colour + Size thành SKU cụ thể.product_iduuid / FKREADSản phẩm. skuvarchar(80) / UQREADSKU. colourvarchar(80) / NOT NULLREADMàu. sizevarchar(30) / NOT NULLREADSize AU. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. product_imagesiduuid / PKREADID ảnh. Gallery sản phẩm.product_iduuid / FKREADSản phẩm. urltext / NOT NULLREADẢnh. sort_orderint / NOT NULLREADThứ tự. is_primaryboolean / NOT NULLREADẢnh chính. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.2 Module · Tài khoản
+F07 · Đăng ký tài khoản
+Mục tiêu: Tạo tài khoản CUSTOMER mới bằng email và mật khẩu.
+
+             Hình F07 · Màn hình tham chiếu: SC-15_Register
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+POST /api/v1/auth/register
+DB đọc/ghi
+users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhập họ tên, email, password, confirm password.
+2. Web validate cơ bản rồi gửi register.
+3. API kiểm tra email unique, hash password và tạo user ACTIVE.
+4. Có thể tạo session ngay sau đăng ký và chuyển về trang trước.
+Quy tắc nghiệp vụ
+ Email unique không phân biệt hoa thường.
+ Password tối thiểu 8 ký tự, có chữ và số.
+ Không lưu plain password.
+Nhánh / ngoại lệ cần xử lý
+ Email đã tồn tại: trả lỗi business rõ ràng.
+ Confirm password không khớp: chặn submit.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                    Sequence F07 · Đăng ký tài khoản
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKINSERTID người dùng. Email unique; password chỉ lưu dạng hash; role mặc định CUSTOMER, status ACTIVE.emailvarchar(255) / UQ, NOT NULLINSERTEmail đăng nhập. password_hashvarchar(255) / NOT NULLINSERTMật khẩu đã hash. first_namevarchar(100) / NOT NULLINSERTTên. last_namevarchar(100) / NOT NULLINSERTHọ. phonevarchar(30) / NULLINSERTSố điện thoại. rolevarchar(20) / NOT NULLINSERTCUSTOMER/ADMIN. statusvarchar(20) / NOT NULLINSERTACTIVE/DISABLED/LOCKED. created_attimestamptz / NOT NULLINSERTNgày tạo. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F08 · Đăng nhập
+Mục tiêu: Xác thực người dùng và tạo phiên đăng nhập.
+
+               Hình F08 · Màn hình tham chiếu: SC-04_Login
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+POST /api/v1/auth/login
+GET /api/v1/me
+DB đọc/ghi
+users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng nhập email/password.
+2. API xác minh credential và trạng thái user.
+3. Tạo secure session/token.
+4. Web tải profile và quay về intended URL nếu có.
+Quy tắc nghiệp vụ
+ Thông báo sai credential dùng message chung.
+ User DISABLED/LOCKED không được login.
+ Session cookie dùng Secure/HttpOnly nếu triển khai cookie.
+Nhánh / ngoại lệ cần xử lý
+ Sai email/password: 401.
+ Nhiều lần sai có thể giới hạn tần suất theo cấu hình.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                         Sequence F08 · Đăng nhập
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKREADID người dùng. Tìm theo email, so khớp password hash, chặn DISABLED/LOCKED.emailvarchar(255) / UQ, NOT NULLREADEmail đăng nhập. password_hashvarchar(255) / NOT NULLREADMật khẩu đã hash. first_namevarchar(100) / NOT NULLREADTên. last_namevarchar(100) / NOT NULLREADHọ. rolevarchar(20) / NOT NULLREADCUSTOMER/ADMIN. statusvarchar(20) / NOT NULLREADACTIVE/DISABLED/LOCKED. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F09 · Đăng xuất
+Mục tiêu: Kết thúc phiên hiện tại và xóa thông tin đăng nhập ở client.
+
+               Hình F09 · Màn hình tham chiếu: SC-04_Login
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+POST /api/v1/auth/logout
+DB đọc/ghi
+users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng chọn Logout.
+2. Web gọi logout API.
+3. Server revoke session/token hiện tại.
+4. Web clear state tài khoản và đưa về Home.
+Quy tắc nghiệp vụ
+ Không xóa cart guest nếu cart quy định cho phép giữ.
+ Logout phải idempotent.
+Nhánh / ngoại lệ cần xử lý
+ Session đã hết hạn: vẫn xử lý như logout thành công.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                         Sequence F09 · Đăng xuất
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKREADID người dùng. Xác nhận user/session hiện tại; phiên đăng nhập được revoke ở lớp auth/session, không sửa profile.statusvarchar(20) / NOT NULLREADACTIVE/DISABLED/LOCKED. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F10 · Quên và đặt lại mật khẩu
+Mục tiêu: Cho phép người dùng nhận liên kết reset và đặt mật khẩu mới.
+
+          Hình F10 · Màn hình tham chiếu: SC-16_ForgotPassword
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+POST /api/v1/auth/forgot-password
+POST /api/v1/auth/reset-password
+DB đọc/ghi
+users, password_reset_tokens
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhập email và yêu cầu reset.
+2. API tạo token có hạn sử dụng nếu email tồn tại.
+3. Email service gửi reset URL.
+4. Người dùng mở URL, nhập password mới.
+5. API validate token, cập nhật password hash và vô hiệu token.
+Quy tắc nghiệp vụ
+ Response forgot-password không tiết lộ email có tồn tại hay không.
+ Token single-use và có expiry.
+ Reset xong có thể revoke các session cũ.
+Nhánh / ngoại lệ cần xử lý
+ Token sai/hết hạn: hiển thị link expired.
+ Password mới không đạt quy định: trả lỗi theo trường.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+              Sequence F10 · Quên và đặt lại mật khẩu
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKREAD/UPDATEID người dùng. Tìm account ACTIVE; cập nhật password_hash khi token hợp lệ.emailvarchar(255) / UQ, NOT NULLREAD/UPDATEEmail đăng nhập. password_hashvarchar(255) / NOT NULLREAD/UPDATEMật khẩu đã hash. statusvarchar(20) / NOT NULLREAD/UPDATEACTIVE/DISABLED/LOCKED. password_reset_tokensiduuid / PKINSERT/UPDATEID token. Token lưu hash, có hạn dùng; used_at ngăn tái sử dụng.user_iduuid / FKINSERT/UPDATENgười dùng. token_hashvarchar(255) / UQINSERT/UPDATEHash token. expires_attimestamptz / NOT NULLINSERT/UPDATEHết hạn. used_attimestamptz / NULLINSERT/UPDATEĐã dùng lúc. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F11 · Quản lý hồ sơ cá nhân
+Mục tiêu: Xem và cập nhật tên, phone và thông tin hồ sơ cho user hiện tại.
+
+              Hình F11 · Màn hình tham chiếu: SC-17_Profile
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+GET /api/v1/me
+PATCH /api/v1/me
+DB đọc/ghi
+users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở My Account > Profile.
+2. Web tải profile từ API.
+3. Người dùng sửa field cho phép.
+4. API validate và cập nhật user.
+Quy tắc nghiệp vụ
+ Email đổi qua flow riêng hoặc không cho đổi trong MVP.
+ Phone chuẩn hóa theo định dạng AU nếu có nhập.
+Nhánh / ngoại lệ cần xử lý
+ Dữ liệu không hợp lệ: giữ form và hiển thị lỗi theo trường.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                 Sequence F11 · Quản lý hồ sơ cá nhân
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKREAD/UPDATEID người dùng. Email dùng nhận diện; cho sửa tên/phone theo rule, không cho đổi role qua chức năng này.emailvarchar(255) / UQ, NOT NULLREAD/UPDATEEmail đăng nhập. first_namevarchar(100) / NOT NULLREAD/UPDATETên. last_namevarchar(100) / NOT NULLREAD/UPDATEHọ. phonevarchar(30) / NULLREAD/UPDATESố điện thoại. statusvarchar(20) / NOT NULLREAD/UPDATEACTIVE/DISABLED/LOCKED. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F12 · Sổ địa chỉ
+Mục tiêu: Lưu nhiều địa chỉ giao hàng và đặt một địa chỉ mặc định.
+
+            Hình F12 · Màn hình tham chiếu: SC-18_AddressBook
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-02
+API chính
+GET /api/v1/addresses
+POST /api/v1/addresses
+PATCH /api/v1/addresses/{id}
+DELETE /api/v1/addresses/{id}
+DB đọc/ghi
+addresses, users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở Addresses.
+2. Tạo mới hoặc Edit address.
+3. API validate Australia address fields.
+4. Set default chuyển default cũ về false trong cùng transaction.
+Quy tắc nghiệp vụ
+ Mỗi user tối đa một is_default=true.
+ State thuộc NSW/VIC/QLD/WA/SA/TAS/ACT/NT.
+ Postcode gồm 4 chữ số.
+Nhánh / ngoại lệ cần xử lý
+ Không được sửa/xóa address của user khác.
+ Xóa default: hệ thống chọn địa chỉ còn lại theo quy định hoặc để không có default.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                       Sequence F12 · Sổ địa chỉ
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngusersiduuid / PKREADID người dùng. Xác nhận owner của address.statusvarchar(20) / NOT NULLREADACTIVE/DISABLED/LOCKED. addressesiduuid / PKREAD/INSERT/UPDATE/DELETEID địa chỉ. CRUD address; chỉ một địa chỉ default/user; country mặc định AU.user_iduuid / FKREAD/INSERT/UPDATE/DELETEChủ sở hữu. labelvarchar(50) / NULLREAD/INSERT/UPDATE/DELETEHome/Work. full_namevarchar(200) / NOT NULLREAD/INSERT/UPDATE/DELETENgười nhận. phonevarchar(30) / NOT NULLREAD/INSERT/UPDATE/DELETEĐiện thoại. line1varchar(255) / NOT NULLREAD/INSERT/UPDATE/DELETEĐịa chỉ dòng 1. suburbvarchar(120) / NOT NULLREAD/INSERT/UPDATE/DELETESuburb. statevarchar(3) / NOT NULLREAD/INSERT/UPDATE/DELETENSW/VIC/.... postcodevarchar(4) / NOT NULLREAD/INSERT/UPDATE/DELETEPostcode AU. countrychar(2) / NOT NULLREAD/INSERT/UPDATE/DELETEAU. is_defaultboolean / NOT NULLREAD/INSERT/UPDATE/DELETEĐịa chỉ mặc định. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.3 Module · Wishlist & Giỏ hàng
+F13 · Wishlist
+Mục tiêu: Lưu sản phẩm/biến thể quan tâm cho tài khoản đã đăng nhập.
+
+             Hình F13 · Màn hình tham chiếu: SC-11_Wishlist
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-07
+API chính
+GET /api/v1/wishlist
+POST /api/v1/wishlist/items
+DELETE /api/v1/wishlist/items/{id}
+DB đọc/ghi
+wishlists, wishlist_items, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhấn heart ở card/PDP.
+2. Nếu chưa login, redirect login với returnUrl.
+3. API add variant vào wishlist.
+4. My Wishlist hiển thị danh sách và cho remove/open PDP.
+Quy tắc nghiệp vụ
+ Add trùng phải idempotent.
+ Wishlist không giữ giá snapshot; hiển thị giá hiện tại.
+Nhánh / ngoại lệ cần xử lý
+ Variant ngừng bán vẫn có thể hiển thị trạng thái unavailable và không cho add cart.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                           Sequence F13 · Wishlist
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngwishlistsiduuid / PKREAD/INSERTID wishlist. Mỗi user có một wishlist chính.user_iduuid / FK,UQREAD/INSERTUser. wishlist_itemsiduuid / PKREAD/INSERT/DELETEID item. Không tạo duplicate variant trong cùng wishlist.wishlist_iduuid / FKREAD/INSERT/DELETEWishlist. variant_iduuid / FKREAD/INSERT/DELETESKU. created_attimestamptz / NOT NULLREAD/INSERT/DELETENgày lưu. product_variantsiduuid / PKREADID biến thể. Hiển thị trạng thái variant hiện tại.product_iduuid / FKREADSản phẩm. skuvarchar(80) / UQREADSKU. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F14 · Thêm sản phẩm vào giỏ
+Mục tiêu: Thêm exact SKU và số lượng vào giỏ hàng đang hoạt động.
+
+                Hình F14 · Màn hình tham chiếu: SC-03_PDP
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-03
+API chính
+POST /api/v1/cart/items
+DB đọc/ghi
+carts, cart_items, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng chọn variant + qty.
+2. Web gửi variantId và qty.
+3. API revalidate status/stock/limit.
+4. Nếu SKU đã có trong cart thì tăng qty theo rule; nếu chưa có thì tạo line.
+5. Trả cart summary mới.
+Quy tắc nghiệp vụ
+ Cart không reserve stock.
+ Qty sau merge không vượt stock/max_per_line.
+ Giá hiển thị được tính lại từ catalog khi đọc cart.
+Nhánh / ngoại lệ cần xử lý
+ Stock không đủ: 409 và trả availableQty.
+ Variant inactive: không thêm.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                 Sequence F14 · Thêm sản phẩm vào giỏ
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcartsiduuid / PKREAD/INSERT/UPDATEID giỏ. Lấy/tạo cart ACTIVE hiện tại.user_iduuid / FK NULLREAD/INSERT/UPDATEUser nếu login. session_keyvarchar(120) / NULLREAD/INSERT/UPDATEGuest session. promotion_iduuid / FK NULLREAD/INSERT/UPDATEPromotion đang áp. statusvarchar(20) / NOT NULLREAD/INSERT/UPDATEACTIVE/CONVERTED/ABANDONED. updated_attimestamptz / NOT NULLREAD/INSERT/UPDATECập nhật. cart_itemsiduuid / PKREAD/INSERT/UPDATEID line. Nếu variant đã có trong cart thì cộng qty theo giới hạn.cart_iduuid / FKREAD/INSERT/UPDATEGiỏ. variant_iduuid / FKREAD/INSERT/UPDATESKU. qtyint / NOT NULLREAD/INSERT/UPDATESố lượng. created_attimestamptz / NOT NULLREAD/INSERT/UPDATENgày thêm. product_variantsiduuid / PKREADID biến thể. Revalidate tồn kho và status trước khi thêm.skuvarchar(80) / UQREADSKU. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F15 · Xem giỏ hàng
+Mục tiêu: Hiển thị các cart line và summary trước checkout.
+
+               Hình F15 · Màn hình tham chiếu: SC-05_Cart
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-03
+API chính
+GET /api/v1/cart
+DB đọc/ghi
+carts, cart_items, product_variants, promotions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở Cart.
+2. API trả item, giá hiện tại, promotion, subtotal, ước tính phí/giao hàng nếu có.
+3. Web hiển thị quantity control, remove và checkout CTA.
+Quy tắc nghiệp vụ
+ Cart rỗng không cho checkout.
+ Nếu giá/availability đổi, UI hiển thị giá/trạng thái mới.
+Nhánh / ngoại lệ cần xử lý
+ SKU vừa hết hàng: cảnh báo trên line và yêu cầu sửa cart trước checkout.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                        Sequence F15 · Xem giỏ hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcartsiduuid / PKREADID giỏ. Cart ACTIVE.user_iduuid / FK NULLREADUser nếu login. session_keyvarchar(120) / NULLREADGuest session. promotion_iduuid / FK NULLREADPromotion đang áp. statusvarchar(20) / NOT NULLREADACTIVE/CONVERTED/ABANDONED. cart_itemsiduuid / PKREADID line. Các dòng hàng.cart_iduuid / FKREADGiỏ. variant_iduuid / FKREADSKU. qtyint / NOT NULLREADSố lượng. product_variantsiduuid / PKREADID biến thể. Giá/tồn kho hiện tại để server tính subtotal.skuvarchar(80) / UQREADSKU. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. promotionsiduuid / PKREADID promotion. Tính discount hiện hành.codevarchar(50) / UQREADMã. typevarchar(20) / NOT NULLREADPERCENT/FIXED. valuenumeric(12,2) / NOT NULLREADGiá trị. min_spendnumeric(12,2) / NULLREADChi tối thiểu. starts_attimestamptz / NOT NULLREADBắt đầu. ends_attimestamptz / NOT NULLREADKết thúc. enabledboolean / NOT NULLREADBật/tắt. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F16 · Cập nhật số lượng trong giỏ
+Mục tiêu: Tăng/giảm số lượng một cart line và tính lại tổng.
+
+               Hình F16 · Màn hình tham chiếu: SC-05_Cart
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-03
+API chính
+PATCH /api/v1/cart/items/{id}
+DB đọc/ghi
+cart_items, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Người dùng thay qty.
+2. API validate qty, stock và quyền sở hữu dữ liệu.
+3. Cập nhật cart item.
+4. Tính lại subtotal/discount/total.
+Quy tắc nghiệp vụ
+ Qty tối thiểu 1; giảm về 0 được xử lý bằng Remove nếu UI hỗ trợ.
+ Mỗi lần cập nhật phải trả chính thức từ server totals.
+Nhánh / ngoại lệ cần xử lý
+ Qty vượt stock: trả availableQty.
+ Cart line không còn tồn tại: refresh cart.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+            Sequence F16 · Cập nhật số lượng trong giỏ
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcart_itemsiduuid / PKREAD/UPDATEID line. Cập nhật qty của đúng cart item.cart_iduuid / FKREAD/UPDATEGiỏ. variant_iduuid / FKREAD/UPDATESKU. qtyint / NOT NULLREAD/UPDATESố lượng. product_variantsiduuid / PKREADID biến thể. Qty mới không được vượt stock/giới hạn.stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F17 · Xóa sản phẩm khỏi giỏ
+Mục tiêu: Loại bỏ cart line không còn mua.
+
+               Hình F17 · Màn hình tham chiếu: SC-05_Cart
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-03
+API chính
+DELETE /api/v1/cart/items/{id}
+DB đọc/ghi
+cart_items, carts
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhấn Remove.
+2. API kiểm tra cart quyền sở hữu dữ liệu và xóa line.
+3. Recalculate promotion/totals.
+4. Nếu cart rỗng hiển thị trạng thái không có dữ liệu.
+Quy tắc nghiệp vụ
+ Remove idempotent theo quy định.
+ Promotion có thể trở nên không đủ min spend sau khi remove.
+Nhánh / ngoại lệ cần xử lý
+ Xóa line làm voucher invalid: tự bỏ voucher và thông báo.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                Sequence F17 · Xóa sản phẩm khỏi giỏ
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcart_itemsiduuid / PKDELETEID line. Xóa đúng item thuộc cart hiện tại.cart_iduuid / FKDELETEGiỏ. variant_iduuid / FKDELETESKU. qtyint / NOT NULLDELETESố lượng. cartsiduuid / PKUPDATEID giỏ. Cập nhật timestamp; promotion có thể phải tính lại sau khi cart đổi.updated_attimestamptz / NOT NULLUPDATECập nhật. promotion_iduuid / FK NULLUPDATEPromotion đang áp. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F18 · Áp dụng và gỡ mã khuyến mãi
+Mục tiêu: Áp dụng promotion code hợp lệ vào cart.
+
+               Hình F18 · Màn hình tham chiếu: SC-05_Cart
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-03
+API chính
+POST /api/v1/cart/promotion
+DELETE /api/v1/cart/promotion
+DB đọc/ghi
+promotions, promotion_usages, carts, cart_items
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhập code và Apply.
+2. API tìm code, kiểm tra active window, min spend, usage limit và eligibility.
+3. Tính discount phía server.
+4. Cart trả discount và payable mới.
+5. Gỡ promotion khôi phục total.
+Quy tắc nghiệp vụ
+ Code unique case-insensitively.
+ Không cộng dồn nhiều promotion trong MVP.
+ Discount không làm order total âm.
+Nhánh / ngoại lệ cần xử lý
+ Code expired/inactive/not eligible: không thay đổi cart.
+ Thay qty/remove làm mất eligibility: tự gỡ promotion.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+             Sequence F18 · Áp dụng và gỡ mã khuyến mãi
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngpromotionsiduuid / PKREADID promotion. Validate code, thời gian hiệu lực, min spend và limit.codevarchar(50) / UQREADMã. typevarchar(20) / NOT NULLREADPERCENT/FIXED. valuenumeric(12,2) / NOT NULLREADGiá trị. min_spendnumeric(12,2) / NULLREADChi tối thiểu. starts_attimestamptz / NOT NULLREADBắt đầu. ends_attimestamptz / NOT NULLREADKết thúc. usage_limitint / NULLREADGiới hạn. enabledboolean / NOT NULLREADBật/tắt. promotion_usagespromotion_iduuid / FKREADPromotion. Đếm/lọc usage khi có giới hạn theo user hoặc toàn hệ thống.user_iduuid / FK NULLREADUser. used_attimestamptz / NOT NULLREADThời điểm dùng. cartsiduuid / PKREAD/UPDATEID giỏ. Gắn/gỡ promotion hợp lệ lên cart.promotion_iduuid / FK NULLREAD/UPDATEPromotion đang áp. statusvarchar(20) / NOT NULLREAD/UPDATEACTIVE/CONVERTED/ABANDONED. cart_itemscart_iduuid / FKREADGiỏ. Nguồn tính subtotal.variant_iduuid / FKREADSKU. qtyint / NOT NULLREADSố lượng. product_variantsiduuid / PKREADID biến thể. Giá đầu vào để tính discount trên server.pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.4 Module · Checkout & Thanh toán
+F19 · Khởi tạo checkout
+Mục tiêu: Tạo checkout session từ cart hiện tại.
+
+             Hình F19 · Màn hình tham chiếu: SC-06_Shipping
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-04
+API chính
+POST /api/v1/checkout/init
+DB đọc/ghi
+checkout_sessions, carts, cart_items, users, addresses
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhấn Checkout từ cart.
+2. API kiểm tra cart không rỗng và các line hợp lệ.
+3. Tạo/refresh checkout session có cart snapshot reference.
+4. Trả default address và available shipping methods.
+Quy tắc nghiệp vụ
+ Checkout session có expiry.
+ Không reserve stock tại bước init.
+ Cart thay đổi sau init phải làm session recalculate.
+Nhánh / ngoại lệ cần xử lý
+ Cart có item invalid/out-of-stock: chặn checkout và trả danh sách line lỗi.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                     Sequence F19 · Khởi tạo checkout
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcartsiduuid / PKREADID giỏ. Cart phải ACTIVE và có item.user_iduuid / FK NULLREADUser nếu login. statusvarchar(20) / NOT NULLREADACTIVE/CONVERTED/ABANDONED. promotion_iduuid / FK NULLREADPromotion đang áp. cart_itemscart_iduuid / FKREADGiỏ. Snapshot input để checkout.variant_iduuid / FKREADSKU. qtyint / NOT NULLREADSố lượng. usersiduuid / PKREADID người dùng. Customer hợp lệ.statusvarchar(20) / NOT NULLREADACTIVE/DISABLED/LOCKED. addressesiduuid / PKREADID địa chỉ. Có thể prefill address mặc định.user_iduuid / FKREADChủ sở hữu. is_defaultboolean / NOT NULLREADĐịa chỉ mặc định. checkout_sessionsiduuid / PKINSERTCheckout ID. Tạo phiên checkout có thời hạn.cart_iduuid / FKINSERTGiỏ. user_iduuid / FK NULLINSERTUser. shipping_address_jsonjsonb / NULLINSERTSnapshot địa chỉ. shipping_methodvarchar(30) / NULLINSERTSTANDARD/EXPRESS. shipping_feenumeric(12,2) / NULLINSERTPhí ship. payment_methodvarchar(30) / NULLINSERTCARD/PAYPAL/AFTERPAY/COD. expires_attimestamptz / NOT NULLINSERTHết hạn. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F20 · Nhập địa chỉ giao hàng
+Mục tiêu: Thu thập địa chỉ giao hàng tại Australia.
+
+             Hình F20 · Màn hình tham chiếu: SC-06_Shipping
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-04
+API chính
+PATCH /api/v1/checkout/shipping-address
+DB đọc/ghi
+checkout_sessions, addresses
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Chọn saved address hoặc nhập địa chỉ mới.
+2. Web validate required fields.
+3. API validate state/postcode và lưu vào checkout session dưới dạng snapshot.
+Quy tắc nghiệp vụ
+ Country cố định Australia.
+ State code hợp lệ; postcode 4 chữ số.
+ Checkout lưu snapshot, không phụ thuộc việc user sửa address book sau đó.
+Nhánh / ngoại lệ cần xử lý
+ Postcode không hỗ trợ: trả lỗi vùng giao hàng.
+ Required field thiếu: trả lỗi theo từng trường.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                Sequence F20 · Nhập địa chỉ giao hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngaddressesiduuid / PKREADID địa chỉ. Nếu chọn address đã lưu thì chỉ cho owner truy cập.user_iduuid / FKREADChủ sở hữu. full_namevarchar(200) / NOT NULLREADNgười nhận. phonevarchar(30) / NOT NULLREADĐiện thoại. line1varchar(255) / NOT NULLREADĐịa chỉ dòng 1. suburbvarchar(120) / NOT NULLREADSuburb. statevarchar(3) / NOT NULLREADNSW/VIC/.... postcodevarchar(4) / NOT NULLREADPostcode AU. countrychar(2) / NOT NULLREADAU. checkout_sessionsiduuid / PKREAD/UPDATECheckout ID. Lưu snapshot địa chỉ vào checkout, không chỉ lưu address_id.user_iduuid / FK NULLREAD/UPDATEUser. shipping_address_jsonjsonb / NULLREAD/UPDATESnapshot địa chỉ. expires_attimestamptz / NOT NULLREAD/UPDATEHết hạn. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F21 · Chọn phương thức giao hàng
+Mục tiêu: Tính và chọn Standard hoặc Express shipping.
+
+             Hình F21 · Màn hình tham chiếu: SC-06_Shipping
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-04
+API chính
+POST /api/v1/checkout/shipping-quote
+DB đọc/ghi
+checkout_sessions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Sau khi có address, Web yêu cầu shipping quote.
+2. API trả danh sách shipping methods + fee + ETA.
+3. Người dùng chọn một method.
+4. Checkout session lưu method/fee.
+Quy tắc nghiệp vụ
+ Standard miễn phí nếu subtotal sau discount >= A$150; dưới ngưỡng A$10.
+ Express A$15 trong MVP.
+ Phí là số liệu server chính thức từ server.
+Nhánh / ngoại lệ cần xử lý
+ Postcode không hỗ trợ Express: chỉ trả Standard.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+               Sequence F21 · Chọn phương thức giao hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcheckout_sessionsiduuid / PKREAD/UPDATECheckout ID. Dùng postcode/state để quote shipping; lưu method + fee đã chọn.shipping_address_jsonjsonb / NULLREAD/UPDATESnapshot địa chỉ. shipping_methodvarchar(30) / NULLREAD/UPDATESTANDARD/EXPRESS. shipping_feenumeric(12,2) / NULLREAD/UPDATEPhí ship. expires_attimestamptz / NOT NULLREAD/UPDATEHết hạn. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F22 · Chọn phương thức thanh toán
+Mục tiêu: Hiển thị và lưu lựa chọn Card, PayPal, Afterpay hoặc COD.
+
+              Hình F22 · Màn hình tham chiếu: SC-07_Payment
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-05
+API chính
+GET /api/v1/payment-methods
+PATCH /api/v1/checkout/payment-method
+DB đọc/ghi
+checkout_sessions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở bước Payment.
+2. API trả phương thức đang enabled theo cấu hình.
+3. Chọn method.
+4. UI hiển thị form/notice tương ứng.
+Quy tắc nghiệp vụ
+ Chỉ phương thức enabled mới hiển thị.
+ Afterpay có thể có min/max order amount.
+ COD có thể bị giới hạn khu vực hoặc order amount.
+Nhánh / ngoại lệ cần xử lý
+ Không có method khả dụng: chặn tiếp tục và hiển thị support message.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+              Sequence F22 · Chọn phương thức thanh toán
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcheckout_sessionsiduuid / PKREAD/UPDATECheckout ID. Chỉ cho chọn method phù hợp với checkout còn hiệu lực.payment_methodvarchar(30) / NULLREAD/UPDATECARD/PAYPAL/AFTERPAY/COD. shipping_methodvarchar(30) / NULLREAD/UPDATESTANDARD/EXPRESS. shipping_feenumeric(12,2) / NULLREAD/UPDATEPhí ship. expires_attimestamptz / NOT NULLREAD/UPDATEHết hạn. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F23 · Thanh toán bằng Credit / Debit Card
+Mục tiêu: Mô phỏng thanh toán Card để tạo trạng thái payment xác định.
+
+              Hình F23 · Màn hình tham chiếu: SC-07_Payment
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-05
+API chính
+POST /api/v1/payments/initiate
+DB đọc/ghi
+payments, payment_transactions, checkout_sessions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhập card number, expiry, CVV, name.
+2. Web validate format cơ bản.
+3. API gửi dữ liệu tới Payment Simulator.
+4. Simulator trả SUCCESS hoặc DECLINED theo kịch bản mô phỏng.
+5. API lưu payment/transaction nhưng không lưu raw CVV/card number.
+Quy tắc nghiệp vụ
+ Chỉ lưu method, last4/token mô phỏng và result code.
+ Amount lấy từ checkout session.
+ Không tin amount do client gửi.
+Nhánh / ngoại lệ cần xử lý
+ Card format sai: 400.
+ DECLINED: giữ checkout để người dùng thử lại hoặc đổi method.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+            Sequence F23 · Thanh toán bằng Credit / Debit Card
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcheckout_sessionsiduuid / PKREADCheckout ID. Payment method phải CARD và session chưa hết hạn.payment_methodvarchar(30) / NULLREADCARD/PAYPAL/AFTERPAY/COD. expires_attimestamptz / NOT NULLREADHết hạn. paymentsiduuid / PKINSERT/UPDATEID payment. Không lưu full card/CVV; chỉ last4 và trạng thái.checkout_session_iduuid / FK NULLINSERT/UPDATECheckout. order_iduuid / FK NULLINSERT/UPDATEOrder. methodvarchar(30) / NOT NULLINSERT/UPDATECARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLINSERT/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLINSERT/UPDATESố tiền. last4varchar(4) / NULLINSERT/UPDATE4 số cuối mô phỏng. provider_refvarchar(120) / NULLINSERT/UPDATEReference mô phỏng. payment_transactionsiduuid / PKINSERTID event. Audit từng attempt/result của simulator.payment_iduuid / FKINSERTPayment. eventvarchar(40) / NOT NULLINSERTINITIATE/CALLBACK/COLLECT. result_codevarchar(60) / NULLINSERTKết quả. payload_jsonjsonb / NULLINSERTMetadata an toàn. created_attimestamptz / NOT NULLINSERTThời điểm. Lưu ý bảo mật: không lưu full card number/CVV hoặc thông tin nhạy cảm của nhà cung cấp; payload_json chỉ chứa dữ liệu mô phỏng/đã mask.
+F24 · Thanh toán bằng PayPal
+Mục tiêu: Mô phỏng flow redirect/pop-up PayPal và nhận kết quả.
+
+              Hình F24 · Màn hình tham chiếu: SC-07_Payment
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-05
+API chính
+POST /api/v1/payments/initiate
+GET /api/v1/payments/{id}
+DB đọc/ghi
+payments, payment_transactions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Chọn PayPal.
+2. API tạo payment PENDING và trả mockRedirectUrl.
+3. Web mở trang mô phỏng PayPal.
+4. Người dùng Confirm hoặc Cancel.
+5. Callback cập nhật SUCCESS/CANCELLED.
+Quy tắc nghiệp vụ
+ Payment status phải đọc lại từ server khi quay về checkout.
+ Không lấy success chỉ từ query string phía client.
+Nhánh / ngoại lệ cần xử lý
+ Popup đóng/cancel: payment không thành công, checkout vẫn còn.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                   Sequence F24 · Thanh toán bằng PayPal
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngpaymentsiduuid / PKINSERT/UPDATEID payment. Tạo payment PAYPAL; status có thể PENDING rồi PAID/FAILED.checkout_session_iduuid / FK NULLINSERT/UPDATECheckout. methodvarchar(30) / NOT NULLINSERT/UPDATECARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLINSERT/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLINSERT/UPDATESố tiền. provider_refvarchar(120) / NULLINSERT/UPDATEReference mô phỏng. payment_transactionspayment_iduuid / FKINSERTPayment. Lưu redirect/callback simulation và kết quả.eventvarchar(40) / NOT NULLINSERTINITIATE/CALLBACK/COLLECT. result_codevarchar(60) / NULLINSERTKết quả. payload_jsonjsonb / NULLINSERTMetadata an toàn. created_attimestamptz / NOT NULLINSERTThời điểm. Lưu ý bảo mật: không lưu full card number/CVV hoặc thông tin nhạy cảm của nhà cung cấp; payload_json chỉ chứa dữ liệu mô phỏng/đã mask.
+F25 · Thanh toán bằng Afterpay
+Mục tiêu: Mô phỏng Buy Now Pay Later với 4 kỳ thanh toán.
+
+              Hình F25 · Màn hình tham chiếu: SC-07_Payment
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-05
+API chính
+POST /api/v1/payments/initiate
+GET /api/v1/payments/{id}
+DB đọc/ghi
+payments, payment_transactions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Chọn Afterpay.
+2. UI hiển thị 4 instalments = payable/4 với xử lý rounding.
+3. API kiểm tra amount eligibility.
+4. Kết quả phê duyệt mô phỏng trả SUCCESS hoặc DECLINED.
+Quy tắc nghiệp vụ
+ Tổng 4 kỳ phải bằng order payable sau rounding.
+ Method chỉ khả dụng trong amount range cấu hình.
+Nhánh / ngoại lệ cần xử lý
+ Amount không hợp lệ: 409 NOT_ELIGIBLE.
+ Kết quả từ chối mô phỏng: cho chọn method khác.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                  Sequence F25 · Thanh toán bằng Afterpay
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngpaymentsiduuid / PKINSERT/UPDATEID payment. Tạo payment AFTERPAY; amount là tổng checkout.checkout_session_iduuid / FK NULLINSERT/UPDATECheckout. methodvarchar(30) / NOT NULLINSERT/UPDATECARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLINSERT/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLINSERT/UPDATESố tiền. provider_refvarchar(120) / NULLINSERT/UPDATEReference mô phỏng. payment_transactionspayment_iduuid / FKINSERTPayment. Lưu approve/decline simulator.eventvarchar(40) / NOT NULLINSERTINITIATE/CALLBACK/COLLECT. result_codevarchar(60) / NULLINSERTKết quả. payload_jsonjsonb / NULLINSERTMetadata an toàn. created_attimestamptz / NOT NULLINSERTThời điểm. Lưu ý bảo mật: không lưu full card number/CVV hoặc thông tin nhạy cảm của nhà cung cấp; payload_json chỉ chứa dữ liệu mô phỏng/đã mask.
+F26 · Thanh toán khi nhận hàng (COD)
+Mục tiêu: Tạo payment chưa thu tiền và cho phép đặt đơn trả tiền khi giao.
+
+              Hình F26 · Màn hình tham chiếu: SC-07_Payment
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-05
+API chính
+POST /api/v1/payments/initiate
+DB đọc/ghi
+payments, checkout_sessions
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Chọn Cash on Delivery.
+2. UI ẩn card fields và hiển thị Pay on delivery notice.
+3. API tạo payment status UNPAID/PENDING_COLLECTION.
+4. Cho phép chuyển sang Review.
+Quy tắc nghiệp vụ
+ COD không được ghi PAID tại checkout.
+ Có thể cấu hình max order amount/postcode eligibility.
+ Khi giao và thu tiền, Admin cập nhật payment PAID.
+Nhánh / ngoại lệ cần xử lý
+ COD không khả dụng cho địa chỉ/order: chặn chọn và giải thích lý do.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+              Sequence F26 · Thanh toán khi nhận hàng (COD)
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcheckout_sessionsiduuid / PKREADCheckout ID. Method phải COD.payment_methodvarchar(30) / NULLREADCARD/PAYPAL/AFTERPAY/COD. expires_attimestamptz / NOT NULLREADHết hạn. paymentsiduuid / PKINSERTID payment. Tạo payment COD với status UNPAID/PENDING; không thu tiền tại checkout.checkout_session_iduuid / FK NULLINSERTCheckout. methodvarchar(30) / NOT NULLINSERTCARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLINSERTINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLINSERTSố tiền. provider_refvarchar(120) / NULLINSERTReference mô phỏng. Lưu ý COD: payment được tạo nhưng chưa PAID tại checkout; trạng thái thu tiền chỉ được cập nhật khi fulfilment xác nhận đã thu tiền.
+F27 · Review và Place Order
+Mục tiêu: Hiển thị snapshot cuối và tạo đơn hàng theo transaction an toàn.
+
+              Hình F27 · Màn hình tham chiếu: SC-08_Review
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-06
+API chính
+GET /api/v1/checkout/review
+POST /api/v1/orders
+DB đọc/ghi
+checkout_sessions, orders, order_items, product_variants, inventory_movements, payments, shipments
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Review hiển thị items, address, shipping, promotion, payment và total.
+2. Người dùng nhấn Place Order.
+3. API revalidate stock, promotion, shipping, payment state.
+4. Trong DB transaction tạo order/items/shipment, trừ stock và ghi inventory movement.
+5. Trả order_no duy nhất.
+Quy tắc nghiệp vụ
+ POST /orders dùng Idempotency-Key.
+ Order items lưu snapshot SKU/name/size/price.
+ Stock không được âm.
+ Với Card/PayPal/Afterpay yêu cầu payment SUCCESS; với COD cho phép PENDING_COLLECTION.
+Nhánh / ngoại lệ cần xử lý
+ Stock mất ở bước cuối: rollback toàn bộ và báo item nào thiếu.
+ Retry cùng idempotency key trả đúng order cũ.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                    Sequence F27 · Review và Place Order
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngcheckout_sessionsiduuid / PKREADCheckout ID. Nguồn checkout phải còn hiệu lực.cart_iduuid / FKREADGiỏ. user_iduuid / FK NULLREADUser. shipping_address_jsonjsonb / NULLREADSnapshot địa chỉ. shipping_methodvarchar(30) / NULLREADSTANDARD/EXPRESS. shipping_feenumeric(12,2) / NULLREADPhí ship. payment_methodvarchar(30) / NULLREADCARD/PAYPAL/AFTERPAY/COD. expires_attimestamptz / NOT NULLREADHết hạn. ordersiduuid / PKINSERTID order. Tạo order một lần theo idempotency_key; total do server tính.order_novarchar(30) / UQINSERTMã hiển thị. user_iduuid / FK NULLINSERTCustomer. statusvarchar(30) / NOT NULLINSERTOrder state. payment_statusvarchar(30) / NOT NULLINSERTPayment state. subtotalnumeric(12,2) / NOT NULLINSERTTạm tính. discountnumeric(12,2) / NOT NULLINSERTGiảm giá. shipping_feenumeric(12,2) / NOT NULLINSERTPhí ship. totalnumeric(12,2) / NOT NULLINSERTTổng trả. shipping_address_jsonjsonb / NOT NULLINSERTSnapshot địa chỉ. idempotency_keyvarchar(100) / UQINSERTChống tạo trùng. created_attimestamptz / NOT NULLINSERTNgày đặt. order_itemsorder_iduuid / FKINSERTOrder. Lưu snapshot để lịch sử không đổi theo catalog.variant_iduuid / FK NULLINSERTVariant hiện tại. sku_snapshotvarchar(80) / NOT NULLINSERTSKU lúc mua. name_snapshotvarchar(255) / NOT NULLINSERTTên lúc mua. size_snapshotvarchar(30) / NOT NULLINSERTSize lúc mua. unit_pricenumeric(12,2) / NOT NULLINSERTĐơn giá. qtyint / NOT NULLINSERTSố lượng. line_totalnumeric(12,2) / NOT NULLINSERTThành tiền. product_variantsiduuid / PKREAD/UPDATEID biến thể. Lock/revalidate và trừ stock trong transaction.stock_qtyint / NOT NULLREAD/UPDATETồn khả dụng. statusvarchar(20) / NOT NULLREAD/UPDATEACTIVE/INACTIVE. inventory_movementsvariant_iduuid / FKINSERTSKU. Ghi ledger xuất kho cho ORDER.typevarchar(40) / NOT NULLINSERTORDER/ORDER_CANCEL/MANUAL_ADJUSTMENT. qty_deltaint / NOT NULLINSERTBiến động +/-. ref_typevarchar(40) / NULLINSERTLoại reference. ref_iduuid / NULLINSERTReference ID. reasonvarchar(255) / NULLINSERTLý do. created_attimestamptz / NOT NULLINSERTThời điểm. paymentsiduuid / PKREAD/UPDATEID payment. Gắn payment với order và xác nhận trạng thái phù hợp.order_iduuid / FK NULLREAD/UPDATEOrder. statusvarchar(30) / NOT NULLREAD/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREAD/UPDATESố tiền. methodvarchar(30) / NOT NULLREAD/UPDATECARD/PAYPAL/AFTERPAY/COD. shipmentsiduuid / PKINSERTID shipment. Khởi tạo shipment ở trạng thái chờ xử lý.order_iduuid / FK,UQINSERTOrder. methodvarchar(30) / NOT NULLINSERTSTANDARD/EXPRESS. statusvarchar(30) / NOT NULLINSERTPENDING/SHIPPED/DELIVERED. Lưu ý transaction: tạo order, order_items, trừ stock và ghi inventory_movements phải nằm trong cùng transaction; lỗi ở bước bất kỳ phải rollback, đồng thời idempotency_key ngăn tạo trùng đơn khi client retry.
+F28 · Xác nhận đơn hàng
+Mục tiêu: Hiển thị order number và dữ liệu xác nhận sau khi đặt đơn thành công.
+
+           Hình F28 · Màn hình tham chiếu: SC-09_Confirmation
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-06
+API chính
+GET /api/v1/orders/{id}
+DB đọc/ghi
+orders, order_items, payments, shipments
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Web điều hướng tới confirmation với order id/token.
+2. API đọc dữ liệu order chính thức từ server.
+3. Hiển thị status, payment status, shipping address, items và total.
+Quy tắc nghiệp vụ
+ Không suy luận thành công chỉ từ trạng thái phía Web.
+ Order number có format AU + sequence/random unique.
+Nhánh / ngoại lệ cần xử lý
+ Order token không hợp lệ: không lộ dữ liệu đơn.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                    Sequence F28 · Xác nhận đơn hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREADID order. Thông tin xác nhận authoritative.order_novarchar(30) / UQREADMã hiển thị. statusvarchar(30) / NOT NULLREADOrder state. payment_statusvarchar(30) / NOT NULLREADPayment state. subtotalnumeric(12,2) / NOT NULLREADTạm tính. discountnumeric(12,2) / NOT NULLREADGiảm giá. shipping_feenumeric(12,2) / NOT NULLREADPhí ship. totalnumeric(12,2) / NOT NULLREADTổng trả. shipping_address_jsonjsonb / NOT NULLREADSnapshot địa chỉ. created_attimestamptz / NOT NULLREADNgày đặt. order_itemsorder_iduuid / FKREADOrder. Danh sách hàng snapshot.sku_snapshotvarchar(80) / NOT NULLREADSKU lúc mua. name_snapshotvarchar(255) / NOT NULLREADTên lúc mua. size_snapshotvarchar(30) / NOT NULLREADSize lúc mua. unit_pricenumeric(12,2) / NOT NULLREADĐơn giá. qtyint / NOT NULLREADSố lượng. line_totalnumeric(12,2) / NOT NULLREADThành tiền. paymentsorder_iduuid / FK NULLREADOrder. Thông tin payment hiển thị an toàn.methodvarchar(30) / NOT NULLREADCARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLREADINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREADSố tiền. last4varchar(4) / NULLREAD4 số cuối mô phỏng. shipmentsorder_iduuid / FK,UQREADOrder. Trạng thái giao hàng ban đầu.methodvarchar(30) / NOT NULLREADSTANDARD/EXPRESS. statusvarchar(30) / NOT NULLREADPENDING/SHIPPED/DELIVERED. tracking_novarchar(100) / NULLREADTracking. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.5 Module · Đơn hàng khách hàng
+F29 · Danh sách đơn hàng của tôi
+Mục tiêu: Liệt kê đơn thuộc user hiện tại theo thời gian giảm dần.
+
+             Hình F29 · Màn hình tham chiếu: SC-10_MyOrders
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-07
+API chính
+GET /api/v1/orders
+DB đọc/ghi
+orders
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở My Orders.
+2. API lọc orders theo authenticated user.
+3. Có thể search order_no và paginate.
+4. Nhấn order mở detail.
+Quy tắc nghiệp vụ
+ Không cho user truyền userId để xem dữ liệu người khác.
+ Sort mặc định created_at desc.
+Nhánh / ngoại lệ cần xử lý
+ Không có đơn: hiển thị trạng thái không có dữ liệu + Continue Shopping.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+               Sequence F29 · Danh sách đơn hàng của tôi
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREADID order. Chỉ trả order thuộc user hiện tại; hỗ trợ pagination/sort.order_novarchar(30) / UQREADMã hiển thị. user_iduuid / FK NULLREADCustomer. statusvarchar(30) / NOT NULLREADOrder state. payment_statusvarchar(30) / NOT NULLREADPayment state. totalnumeric(12,2) / NOT NULLREADTổng trả. created_attimestamptz / NOT NULLREADNgày đặt. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F30 · Chi tiết đơn hàng
+Mục tiêu: Hiển thị toàn bộ snapshot của một đơn thuộc user hiện tại.
+
+            Hình F30 · Màn hình tham chiếu: SC-19_OrderDetail
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-07
+API chính
+GET /api/v1/orders/{id}
+DB đọc/ghi
+orders, order_items, payments, shipments
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở order detail từ My Orders.
+2. API kiểm tra quyền sở hữu dữ liệu.
+3. Trả items, totals, shipping address, payment, shipment và trạng thái.
+Quy tắc nghiệp vụ
+ Dữ liệu order item là snapshot tại thời điểm mua.
+ Payment status và order status hiển thị riêng.
+Nhánh / ngoại lệ cần xử lý
+ Order không thuộc user: 404 hoặc 403 theo security quy định.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                    Sequence F30 · Chi tiết đơn hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREADID order. Header order.order_novarchar(30) / UQREADMã hiển thị. user_iduuid / FK NULLREADCustomer. statusvarchar(30) / NOT NULLREADOrder state. payment_statusvarchar(30) / NOT NULLREADPayment state. subtotalnumeric(12,2) / NOT NULLREADTạm tính. discountnumeric(12,2) / NOT NULLREADGiảm giá. shipping_feenumeric(12,2) / NOT NULLREADPhí ship. totalnumeric(12,2) / NOT NULLREADTổng trả. shipping_address_jsonjsonb / NOT NULLREADSnapshot địa chỉ. created_attimestamptz / NOT NULLREADNgày đặt. order_itemsorder_iduuid / FKREADOrder. Chi tiết item snapshot.sku_snapshotvarchar(80) / NOT NULLREADSKU lúc mua. name_snapshotvarchar(255) / NOT NULLREADTên lúc mua. size_snapshotvarchar(30) / NOT NULLREADSize lúc mua. unit_pricenumeric(12,2) / NOT NULLREADĐơn giá. qtyint / NOT NULLREADSố lượng. line_totalnumeric(12,2) / NOT NULLREADThành tiền. paymentsorder_iduuid / FK NULLREADOrder. Payment summary.methodvarchar(30) / NOT NULLREADCARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLREADINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREADSố tiền. last4varchar(4) / NULLREAD4 số cuối mô phỏng. shipmentsorder_iduuid / FK,UQREADOrder. Fulfilment/tracking.methodvarchar(30) / NOT NULLREADSTANDARD/EXPRESS. statusvarchar(30) / NOT NULLREADPENDING/SHIPPED/DELIVERED. tracking_novarchar(100) / NULLREADTracking. shipped_attimestamptz / NULLREADGửi lúc. delivered_attimestamptz / NULLREADGiao lúc. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F31 · Hủy đơn hàng
+Mục tiêu: Cho phép hủy đơn khi còn trong trạng thái cho phép.
+
+            Hình F31 · Màn hình tham chiếu: SC-19_OrderDetail
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-07
+API chính
+POST /api/v1/orders/{id}/cancel
+DB đọc/ghi
+orders, order_items, inventory_movements, product_variants, payments
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhấn Cancel Order.
+2. API kiểm tra quyền sở hữu dữ liệu + status eligibility.
+3. Đổi order status CANCELLED.
+4. Hoàn stock bằng inventory movement.
+5. Nếu payment đã SUCCESS thì ghi refund_required/refund_pending theo MVP quy định.
+Quy tắc nghiệp vụ
+ Chỉ PENDING_PAYMENT/PROCESSING trước fulfilment cutoff mới được hủy.
+ Restock phải cùng transaction với cancel.
+Nhánh / ngoại lệ cần xử lý
+ Đơn SHIPPED/DELIVERED không cho cancel.
+ Cancel lặp lại trả trạng thái hiện tại.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                       Sequence F31 · Hủy đơn hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREAD/UPDATEID order. Chỉ owner hủy; chỉ status đủ điều kiện mới chuyển CANCELLED.user_iduuid / FK NULLREAD/UPDATECustomer. statusvarchar(30) / NOT NULLREAD/UPDATEOrder state. payment_statusvarchar(30) / NOT NULLREAD/UPDATEPayment state. order_itemsorder_iduuid / FKREADOrder. Xác định stock cần hoàn.variant_iduuid / FK NULLREADVariant hiện tại. qtyint / NOT NULLREADSố lượng. product_variantsiduuid / PKUPDATEID biến thể. Cộng trả stock khi cancellation rule yêu cầu.stock_qtyint / NOT NULLUPDATETồn khả dụng. inventory_movementsvariant_iduuid / FKINSERTSKU. Ghi movement RESTOCK/CANCEL.typevarchar(40) / NOT NULLINSERTORDER/ORDER_CANCEL/MANUAL_ADJUSTMENT. qty_deltaint / NOT NULLINSERTBiến động +/-. ref_typevarchar(40) / NULLINSERTLoại reference. ref_iduuid / NULLINSERTReference ID. reasonvarchar(255) / NULLINSERTLý do. created_attimestamptz / NOT NULLINSERTThời điểm. paymentsorder_iduuid / FK NULLREAD/UPDATEOrder. Nếu đã trả tiền thì chuyển trạng thái refund flow theo phạm vi mô phỏng.methodvarchar(30) / NOT NULLREAD/UPDATECARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLREAD/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREAD/UPDATESố tiền. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F32 · Mua lại (Buy Again)
+Mục tiêu: Tạo cart mới từ các SKU còn khả dụng trong đơn cũ.
+
+            Hình F32 · Màn hình tham chiếu: SC-19_OrderDetail
+Actor
+Guest/Customer
+Sequence liên quan
+SEQ-07
+API chính
+POST /api/v1/orders/{id}/reorder
+DB đọc/ghi
+orders, order_items, carts, cart_items, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Nhấn Buy Again.
+2. API đọc order items snapshot và map về variant hiện tại.
+3. Variant active được thêm vào giỏ hàng đang hoạt động với qty phù hợp stock.
+4. Trả cart và danh sách item không thể thêm.
+Quy tắc nghiệp vụ
+ Giá dùng giá hiện tại, không dùng giá snapshot cũ.
+ Không tự áp lại promotion cũ.
+Nhánh / ngoại lệ cần xử lý
+ SKU discontinued/out-of-stock: bỏ qua hoặc thêm với cảnh báo theo quy định, không làm fail toàn bộ.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                     Sequence F32 · Mua lại (Buy Again)
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREADID order. Xác nhận order cũ thuộc user.user_iduuid / FK NULLREADCustomer. statusvarchar(30) / NOT NULLREADOrder state. order_itemsorder_iduuid / FKREADOrder. Nguồn dựng lại cart.variant_iduuid / FK NULLREADVariant hiện tại. qtyint / NOT NULLREADSố lượng. product_variantsiduuid / PKREADID biến thể. Chỉ thêm variant vẫn bán và còn hàng; dùng giá hiện tại.statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. stock_qtyint / NOT NULLREADTồn khả dụng. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. cartsiduuid / PKREAD/INSERTID giỏ. Lấy/tạo cart ACTIVE.user_iduuid / FK NULLREAD/INSERTUser nếu login. statusvarchar(20) / NOT NULLREAD/INSERTACTIVE/CONVERTED/ABANDONED. cart_itemscart_iduuid / FKINSERT/UPDATEGiỏ. Thêm lại item theo khả năng tồn kho hiện tại.variant_iduuid / FKINSERT/UPDATESKU. qtyint / NOT NULLINSERT/UPDATESố lượng. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.6 Module · Admin · Sản phẩm & tồn kho
+F33 · Danh sách và tìm kiếm sản phẩm
+Mục tiêu: Cho Admin tìm product/SKU và theo dõi trạng thái, giá và stock.
+
+           Hình F33 · Màn hình tham chiếu: SC-12_AdminProducts
+Actor
+Admin
+Sequence liên quan
+SEQ-08
+API chính
+GET /api/v1/admin/products
+DB đọc/ghi
+products, brands, product_variants
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Admin mở Products.
+2. API trả product list theo q/brand/status/page.
+3. Bảng hiển thị SKU count, price range, stock summary và status.
+4. Chọn product để edit.
+Quy tắc nghiệp vụ
+ Chỉ ADMIN truy cập.
+ Search hỗ trợ name/slug/SKU.
+Nhánh / ngoại lệ cần xử lý
+ Không có kết quả: empty table state.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+            Sequence F33 · Danh sách và tìm kiếm sản phẩm
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Danh sách Admin.brand_iduuid / FKREADBrand. namevarchar(255) / NOT NULLREADTên sản phẩm. slugvarchar(255) / UQREADSlug. statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. created_attimestamptz / NOT NULLREADNgày tạo. brandsiduuid / PKREADID brand. Hiển thị/filter brand.namevarchar(120) / UQREADTên brand. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. product_variantsproduct_iduuid / FKREADSản phẩm. Tổng quan SKU/price/stock.skuvarchar(80) / UQREADSKU. pricenumeric(12,2) / NOT NULLREADGiá gốc. sale_pricenumeric(12,2) / NULLREADGiá sale. stock_qtyint / NOT NULLREADTồn khả dụng. statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F34 · Tạo và cập nhật sản phẩm
+Mục tiêu: Quản lý thông tin nhóm sản phẩm: name, brand, slug, description, status và ảnh.
+
+         Hình F34 · Màn hình tham chiếu: SC-20_AdminProductForm
+Actor
+Admin
+Sequence liên quan
+SEQ-08
+API chính
+POST /api/v1/admin/products
+PATCH /api/v1/admin/products/{id}
+DB đọc/ghi
+products, brands, product_images, audit_logs
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Create Product hoặc Edit.
+2. Nhập dữ liệu và upload/select image URL.
+3. API validate brand, slug unique và required fields.
+4. Lưu product và audit thay đổi.
+Quy tắc nghiệp vụ
+ Slug unique.
+ Không hard-delete product đã từng phát sinh order; chuyển status INACTIVE.
+ Ảnh có sort_order và primary flag.
+Nhánh / ngoại lệ cần xử lý
+ Slug trùng: 409.
+ Brand inactive: không cho publish ACTIVE.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+              Sequence F34 · Tạo và cập nhật sản phẩm
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngbrandsiduuid / PKREADID brand. Brand được chọn phải hợp lệ.statusvarchar(20) / NOT NULLREADACTIVE/INACTIVE. productsiduuid / PKINSERT/UPDATEID sản phẩm. Slug unique; trạng thái theo lifecycle catalog.brand_iduuid / FKINSERT/UPDATEBrand. namevarchar(255) / NOT NULLINSERT/UPDATETên sản phẩm. slugvarchar(255) / UQINSERT/UPDATESlug. descriptiontext / NULLINSERT/UPDATEMô tả. statusvarchar(20) / NOT NULLINSERT/UPDATEDRAFT/ACTIVE/INACTIVE. created_attimestamptz / NOT NULLINSERT/UPDATENgày tạo. product_imagesiduuid / PKINSERT/UPDATEID ảnh. Quản lý gallery và primary image.product_iduuid / FKINSERT/UPDATESản phẩm. urltext / NOT NULLINSERT/UPDATEẢnh. sort_orderint / NOT NULLINSERT/UPDATEThứ tự. is_primaryboolean / NOT NULLINSERT/UPDATEẢnh chính. audit_logsactor_user_iduuid / FK NULLINSERTNgười thao tác. Ghi thay đổi quan trọng của Admin.entity_typevarchar(60) / NOT NULLINSERTLoại entity. entity_iduuid / NOT NULLINSERTID entity. actionvarchar(60) / NOT NULLINSERTCREATE/UPDATE/STATUS_CHANGE. before_jsonjsonb / NULLINSERTTrước. after_jsonjsonb / NULLINSERTSau. created_attimestamptz / NOT NULLINSERTThời điểm. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F35 · Quản lý biến thể, SKU và giá
+Mục tiêu: Tạo/cập nhật Colour + Size + SKU + price + sale price cho sản phẩm.
+
+         Hình F35 · Màn hình tham chiếu: SC-20_AdminProductForm
+Actor
+Admin
+Sequence liên quan
+SEQ-08
+API chính
+POST /api/v1/admin/products/{id}/variants
+PATCH /api/v1/admin/variants/{id}
+DB đọc/ghi
+product_variants, products, audit_logs
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Mở product edit.
+2. Add Variant hoặc sửa variant.
+3. API kiểm tra unique SKU và unique combination theo product.
+4. Lưu price/status.
+Quy tắc nghiệp vụ
+ SKU unique toàn hệ thống.
+ price > 0.
+ sale_price nếu có phải >0 và < price.
+ Không xóa cứng variant có lịch sử đơn hàng.
+Nhánh / ngoại lệ cần xử lý
+ SKU trùng: 409.
+ Price không hợp lệ: lỗi theo trường.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+             Sequence F35 · Quản lý biến thể, SKU và giá
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproductsiduuid / PKREADID sản phẩm. Variant phải thuộc product tồn tại.statusvarchar(20) / NOT NULLREADDRAFT/ACTIVE/INACTIVE. product_variantsiduuid / PKINSERT/UPDATEID biến thể. SKU unique; sale_price hợp lệ; size/colour xác định variant.product_iduuid / FKINSERT/UPDATESản phẩm. skuvarchar(80) / UQINSERT/UPDATESKU. colourvarchar(80) / NOT NULLINSERT/UPDATEMàu. sizevarchar(30) / NOT NULLINSERT/UPDATESize AU. pricenumeric(12,2) / NOT NULLINSERT/UPDATEGiá gốc. sale_pricenumeric(12,2) / NULLINSERT/UPDATEGiá sale. stock_qtyint / NOT NULLINSERT/UPDATETồn khả dụng. statusvarchar(20) / NOT NULLINSERT/UPDATEACTIVE/INACTIVE. audit_logsactor_user_iduuid / FK NULLINSERTNgười thao tác. Audit thay đổi SKU/giá.entity_typevarchar(60) / NOT NULLINSERTLoại entity. entity_iduuid / NOT NULLINSERTID entity. actionvarchar(60) / NOT NULLINSERTCREATE/UPDATE/STATUS_CHANGE. before_jsonjsonb / NULLINSERTTrước. after_jsonjsonb / NULLINSERTSau. created_attimestamptz / NOT NULLINSERTThời điểm. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F36 · Điều chỉnh tồn kho
+Mục tiêu: Tăng/giảm stock thông qua giao dịch điều chỉnh có lý do.
+
+           Hình F36 · Màn hình tham chiếu: SC-12_AdminProducts
+Actor
+Admin
+Sequence liên quan
+SEQ-08
+API chính
+POST /api/v1/admin/inventory-adjustments
+DB đọc/ghi
+product_variants, inventory_movements, audit_logs
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Admin chọn SKU và Adjustment type.
+2. Nhập qty delta và reason.
+3. API lock variant, kiểm tra stock mới >=0.
+4. Cập nhật stock_qty và ghi inventory movement.
+Quy tắc nghiệp vụ
+ Không sửa stock_qty trực tiếp bằng form product.
+ Mọi thay đổi stock có movement record.
+ Reference type MANUAL_ADJUSTMENT/ORDER/ORDER_CANCEL.
+Nhánh / ngoại lệ cần xử lý
+ Adjustment làm stock âm: reject.
+ Concurrent update dùng row lock/version.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                   Sequence F36 · Điều chỉnh tồn kho
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngproduct_variantsiduuid / PKREAD/UPDATEID biến thể. Cập nhật stock_qty bằng delta hợp lệ.skuvarchar(80) / UQREAD/UPDATESKU. stock_qtyint / NOT NULLREAD/UPDATETồn khả dụng. statusvarchar(20) / NOT NULLREAD/UPDATEACTIVE/INACTIVE. inventory_movementsiduuid / PKINSERTID movement. Mỗi điều chỉnh tồn phải có movement và reason.variant_iduuid / FKINSERTSKU. typevarchar(40) / NOT NULLINSERTORDER/ORDER_CANCEL/MANUAL_ADJUSTMENT. qty_deltaint / NOT NULLINSERTBiến động +/-. ref_typevarchar(40) / NULLINSERTLoại reference. ref_iduuid / NULLINSERTReference ID. reasonvarchar(255) / NULLINSERTLý do. created_attimestamptz / NOT NULLINSERTThời điểm. audit_logsactor_user_iduuid / FK NULLINSERTNgười thao tác. Audit thao tác Admin.entity_typevarchar(60) / NOT NULLINSERTLoại entity. entity_iduuid / NOT NULLINSERTID entity. actionvarchar(60) / NOT NULLINSERTCREATE/UPDATE/STATUS_CHANGE. before_jsonjsonb / NULLINSERTTrước. after_jsonjsonb / NULLINSERTSau. created_attimestamptz / NOT NULLINSERTThời điểm. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.7 Module · Admin · Đơn hàng
+F37 · Danh sách và chi tiết đơn hàng
+Mục tiêu: Cho Admin tìm kiếm mọi đơn và xem payment/fulfilment detail.
+
+            Hình F37 · Màn hình tham chiếu: SC-13_AdminOrders
+Actor
+Admin
+Sequence liên quan
+SEQ-09
+API chính
+GET /api/v1/admin/orders
+GET /api/v1/admin/orders/{id}
+DB đọc/ghi
+orders, order_items, payments, shipments, users
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Admin mở Orders.
+2. Filter theo order_no, email, order status, payment status, date.
+3. Mở order detail để xem items, address, payment transaction và shipment.
+Quy tắc nghiệp vụ
+ Order status và payment status là hai dimension riêng.
+ Danh sách có pagination.
+Nhánh / ngoại lệ cần xử lý
+ Filter không hợp lệ: trả 400.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+             Sequence F37 · Danh sách và chi tiết đơn hàng
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREADID order. Search/list/detail order.order_novarchar(30) / UQREADMã hiển thị. user_iduuid / FK NULLREADCustomer. statusvarchar(30) / NOT NULLREADOrder state. payment_statusvarchar(30) / NOT NULLREADPayment state. totalnumeric(12,2) / NOT NULLREADTổng trả. created_attimestamptz / NOT NULLREADNgày đặt. order_itemsorder_iduuid / FKREADOrder. Chi tiết hàng.sku_snapshotvarchar(80) / NOT NULLREADSKU lúc mua. name_snapshotvarchar(255) / NOT NULLREADTên lúc mua. qtyint / NOT NULLREADSố lượng. line_totalnumeric(12,2) / NOT NULLREADThành tiền. paymentsorder_iduuid / FK NULLREADOrder. Trạng thái thanh toán.methodvarchar(30) / NOT NULLREADCARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLREADINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREADSố tiền. shipmentsorder_iduuid / FK,UQREADOrder. Trạng thái giao hàng.methodvarchar(30) / NOT NULLREADSTANDARD/EXPRESS. statusvarchar(30) / NOT NULLREADPENDING/SHIPPED/DELIVERED. tracking_novarchar(100) / NULLREADTracking. usersiduuid / PKREADID người dùng. Thông tin customer phục vụ vận hành.emailvarchar(255) / UQ, NOT NULLREADEmail đăng nhập. first_namevarchar(100) / NOT NULLREADTên. last_namevarchar(100) / NOT NULLREADHọ. phonevarchar(30) / NULLREADSố điện thoại. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F38 · Cập nhật fulfilment, giao hàng và thu COD
+Mục tiêu: Điều phối PROCESSING --> SHIPPED --> DELIVERED và cập nhật thanh toán COD khi thu tiền.
+
+            Hình F38 · Màn hình tham chiếu: SC-13_AdminOrders
+Actor
+Admin
+Sequence liên quan
+SEQ-09
+API chính
+PATCH /api/v1/admin/orders/{id}/status
+PATCH /api/v1/admin/orders/{id}/shipment
+PATCH /api/v1/admin/orders/{id}/payment
+DB đọc/ghi
+orders, shipments, payments, payment_transactions, audit_logs
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Admin nhập tracking nếu có và chuyển SHIPPED.
+2. Khi carrier xác nhận giao, chuyển DELIVERED.
+3. Với COD, Admin xác nhận Collected để payment chuyển PAID.
+4. Mọi thay đổi được audit.
+Quy tắc nghiệp vụ
+ Chuyển trạng thái whitelist enforced phía server.
+ COD chỉ PAID sau khi thu tiền.
+ Không chuyển ngược DELIVERED về PROCESSING.
+Nhánh / ngoại lệ cần xử lý
+ Transition sai: 409.
+ COD mark paid trên non-COD order: reject.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+        Sequence F38 · Cập nhật fulfilment, giao hàng và thu COD
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngordersiduuid / PKREAD/UPDATEID order. Chuyển order status theo state machine.statusvarchar(30) / NOT NULLREAD/UPDATEOrder state. payment_statusvarchar(30) / NOT NULLREAD/UPDATEPayment state. shipmentsiduuid / PKINSERT/UPDATEID shipment. Cập nhật tracking và mốc giao hàng.order_iduuid / FK,UQINSERT/UPDATEOrder. methodvarchar(30) / NOT NULLINSERT/UPDATESTANDARD/EXPRESS. statusvarchar(30) / NOT NULLINSERT/UPDATEPENDING/SHIPPED/DELIVERED. tracking_novarchar(100) / NULLINSERT/UPDATETracking. shipped_attimestamptz / NULLINSERT/UPDATEGửi lúc. delivered_attimestamptz / NULLINSERT/UPDATEGiao lúc. paymentsiduuid / PKREAD/UPDATEID payment. COD: chuyển PAID khi xác nhận đã thu tiền; không được đổi tùy ý với payment khác.order_iduuid / FK NULLREAD/UPDATEOrder. methodvarchar(30) / NOT NULLREAD/UPDATECARD/PAYPAL/AFTERPAY/COD. statusvarchar(30) / NOT NULLREAD/UPDATEINITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID. amountnumeric(12,2) / NOT NULLREAD/UPDATESố tiền. payment_transactionspayment_iduuid / FKINSERTPayment. Ghi event thu COD/cập nhật trạng thái.eventvarchar(40) / NOT NULLINSERTINITIATE/CALLBACK/COLLECT. result_codevarchar(60) / NULLINSERTKết quả. payload_jsonjsonb / NULLINSERTMetadata an toàn. created_attimestamptz / NOT NULLINSERTThời điểm. audit_logsactor_user_iduuid / FK NULLINSERTNgười thao tác. Audit fulfilment/payment update.entity_typevarchar(60) / NOT NULLINSERTLoại entity. entity_iduuid / NOT NULLINSERTID entity. actionvarchar(60) / NOT NULLINSERTCREATE/UPDATE/STATUS_CHANGE. before_jsonjsonb / NULLINSERTTrước. after_jsonjsonb / NULLINSERTSau. created_attimestamptz / NOT NULLINSERTThời điểm. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+5.8 Module · Admin · Khuyến mãi
+F39 · Danh sách khuyến mãi
+Mục tiêu: Tìm promotion theo code, trạng thái và khoảng thời gian.
+
+          Hình F39 · Màn hình tham chiếu: SC-14_AdminPromotions
+Actor
+Admin
+Sequence liên quan
+SEQ-10
+API chính
+GET /api/v1/admin/promotions
+DB đọc/ghi
+promotions, promotion_usages
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Admin mở Promotions.
+2. API trả danh sách code, type, value, min spend, usage và active window.
+3. Chọn promotion để edit.
+Quy tắc nghiệp vụ
+ Trạng thái hiển thị dựa trên enabled + current time.
+ Usage hiển thị used/limit.
+Nhánh / ngoại lệ cần xử lý
+ Promotion hết hạn vẫn giữ để tham chiếu lịch sử.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+                   Sequence F39 · Danh sách khuyến mãi
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngpromotionsiduuid / PKREADID promotion. Danh sách/filter promotion.codevarchar(50) / UQREADMã. typevarchar(20) / NOT NULLREADPERCENT/FIXED. valuenumeric(12,2) / NOT NULLREADGiá trị. min_spendnumeric(12,2) / NULLREADChi tối thiểu. starts_attimestamptz / NOT NULLREADBắt đầu. ends_attimestamptz / NOT NULLREADKết thúc. usage_limitint / NULLREADGiới hạn. enabledboolean / NOT NULLREADBật/tắt. promotion_usagespromotion_iduuid / FKREADPromotion. Dùng để thống kê số lần đã sử dụng.user_iduuid / FK NULLREADUser. order_iduuid / FKREADOrder. used_attimestamptz / NOT NULLREADThời điểm dùng. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+F40 · Tạo và cập nhật khuyến mãi
+Mục tiêu: Cấu hình voucher theo PERCENT/FIXED, min spend, thời gian và giới hạn sử dụng.
+
+          Hình F40 · Màn hình tham chiếu: SC-14_AdminPromotions
+Actor
+Admin
+Sequence liên quan
+SEQ-10
+API chính
+POST /api/v1/admin/promotions
+PATCH /api/v1/admin/promotions/{id}
+DB đọc/ghi
+promotions, promotion_usages, audit_logs
+Điều kiện đầu vào
+Session/permission và dữ liệu nghiệp vụ phải hợp lệ theo chức năng.
+Luồng chính
+1. Create Promotion hoặc Edit.
+2. Nhập code, type, value, minSpend, startsAt, endsAt, usageLimit, enabled.
+3. API validate và lưu.
+Quy tắc nghiệp vụ
+ Code unique case-insensitively.
+ PERCENT: 0 < value <=100; FIXED: value>0.
+ starts_at < ends_at.
+ usage_limit không nhỏ hơn số đã dùng.
+Nhánh / ngoại lệ cần xử lý
+ Code trùng: 409.
+ Rule không hợp lệ: lỗi theo từng trường.
+Kết quả sau chức năng
+Web phải phản ánh đúng trạng thái chính thức từ server từ API; dữ liệu ghi xuống DB phải tuân thủ các constraint và chuyển trạng thái được mô tả trong chức năng này.
+Sequence Diagram chi tiết
+                                       
+             Sequence F40 · Tạo và cập nhật khuyến mãi
+Database tác động ở mức field
+Bảng dưới đây chỉ liệt kê các field thực sự tham gia chức năng này. READ = đọc/validate; INSERT = tạo mới; UPDATE = thay đổi; DELETE = xóa.
+BảngFieldKiểu / ConstraintThao tácÝ nghĩa trong chức năngpromotionsiduuid / PKINSERT/UPDATEID promotion. Code unique; thời gian hợp lệ; value phù hợp type.codevarchar(50) / UQINSERT/UPDATEMã. typevarchar(20) / NOT NULLINSERT/UPDATEPERCENT/FIXED. valuenumeric(12,2) / NOT NULLINSERT/UPDATEGiá trị. min_spendnumeric(12,2) / NULLINSERT/UPDATEChi tối thiểu. starts_attimestamptz / NOT NULLINSERT/UPDATEBắt đầu. ends_attimestamptz / NOT NULLINSERT/UPDATEKết thúc. usage_limitint / NULLINSERT/UPDATEGiới hạn. enabledboolean / NOT NULLINSERT/UPDATEBật/tắt. promotion_usagespromotion_iduuid / FKREADPromotion. Không cho thay đổi gây mâu thuẫn với usage đã phát sinh theo rule.used_attimestamptz / NOT NULLREADThời điểm dùng. audit_logsactor_user_iduuid / FK NULLINSERTNgười thao tác. Audit create/update promotion.entity_typevarchar(60) / NOT NULLINSERTLoại entity. entity_iduuid / NOT NULLINSERTID entity. actionvarchar(60) / NOT NULLINSERTCREATE/UPDATE/STATUS_CHANGE. before_jsonjsonb / NULLINSERTTrước. after_jsonjsonb / NULLINSERTSau. created_attimestamptz / NOT NULLINSERTThời điểm. Nguyên tắc: API phải kiểm tra quyền sở hữu, trạng thái entity và business rule trước khi thực hiện thao tác ghi dữ liệu.
+6. Đặc tả API
+6.1 Quy ước chung
+ Base path: /api/v1; JSON UTF-8; thời gian dùng ISO-8601 UTC.
+ Authentication: customer session/bearer; /admin/* yêu cầu role ADMIN.
+ Error envelope: {code, message, fieldErrors?, correlationId}.
+ Status phổ biến: 200/201 thành công, 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict/trạng thái nghiệp vụ, 500 unexpected.
+ List API dùng page, pageSize, sort và filter query parameters.
+ POST /orders bắt buộc Idempotency-Key.
+6.2 API Catalog
+ID
+Method
+Endpoint
+Auth
+Mục đích
+Bảng chính
+API-001
+GET
+/api/v1/home
+Public
+Home content
+products,brands,categories
+API-002
+GET
+/api/v1/products
+Public
+Search/list/filter/sort products
+products,brands,product_variants,product_images
+API-003
+GET
+/api/v1/products/{slug}
+Public
+Product detail
+products,product_variants,product_images
+API-004
+GET
+/api/v1/categories
+Public
+Danh sách category
+categories
+API-005
+GET
+/api/v1/brands
+Public
+Danh sách brand
+brands
+API-006
+POST
+/api/v1/auth/register
+Public
+Register
+users
+API-007
+POST
+/api/v1/auth/login
+Public
+Login
+users
+API-008
+POST
+/api/v1/auth/logout
+Customer
+Logout
+users
+API-009
+POST
+/api/v1/auth/forgot-password
+Public
+Create reset request
+password_reset_tokens,users
+API-010
+POST
+/api/v1/auth/reset-password
+Public
+Reset password
+password_reset_tokens,users
+API-011
+GET
+/api/v1/me
+Customer
+Hồ sơ hiện tại
+users
+API-012
+PATCH
+/api/v1/me
+Customer
+Cập nhật hồ sơ
+users
+API-013
+GET
+/api/v1/addresses
+Customer
+Danh sách địa chỉ
+addresses
+API-014
+POST
+/api/v1/addresses
+Customer
+Tạo địa chỉ
+addresses
+API-015
+PATCH
+/api/v1/addresses/{id}
+Customer
+Cập nhật địa chỉ
+addresses
+API-016
+DELETE
+/api/v1/addresses/{id}
+Customer
+Xóa địa chỉ
+addresses
+API-017
+GET
+/api/v1/wishlist
+Customer
+Wishlist
+wishlists,wishlist_items
+API-018
+POST
+/api/v1/wishlist/items
+Customer
+Add wishlist item
+wishlist_items
+API-019
+DELETE
+/api/v1/wishlist/items/{id}
+Customer
+Remove wishlist item
+wishlist_items
+API-020
+GET
+/api/v1/cart
+Session
+Read giỏ hàng đang hoạt động
+carts,cart_items
+API-021
+POST
+/api/v1/cart/items
+Session
+Thêm sản phẩm vào giỏ
+carts,cart_items,product_variants
+API-022
+PATCH
+/api/v1/cart/items/{id}
+Session
+Cập nhật sản phẩm trong giỏ
+cart_items,product_variants
+API-023
+DELETE
+/api/v1/cart/items/{id}
+Session
+Xóa sản phẩm khỏi giỏ
+cart_items
+API-024
+POST
+/api/v1/cart/promotion
+Session
+Áp dụng promotion
+promotions,carts
+API-025
+DELETE
+/api/v1/cart/promotion
+Session
+Gỡ promotion
+carts
+API-026
+POST
+/api/v1/checkout/init
+Session
+Tạo phiên checkout
+checkout_sessions,carts
+API-027
+PATCH
+/api/v1/checkout/shipping-address
+Session
+Lưu snapshot địa chỉ giao hàng
+checkout_sessions
+API-028
+POST
+/api/v1/checkout/shipping-quote
+Session
+Tính phí giao hàng
+checkout_sessions
+API-029
+GET
+/api/v1/payment-methods
+Public/Session
+Phương thức thanh toán khả dụng
+configuration
+API-030
+PATCH
+/api/v1/checkout/payment-method
+Session
+Chọn phương thức thanh toán
+checkout_sessions
+API-031
+POST
+/api/v1/payments/initiate
+Session
+Khởi tạo thanh toán mô phỏng
+payments,payment_transactions
+API-032
+GET
+/api/v1/payments/{id}
+Session
+Đọc trạng thái payment
+payments,payment_transactions
+API-033
+GET
+/api/v1/checkout/review
+Session
+Get chính thức từ server review
+checkout_sessions,carts
+API-034
+POST
+/api/v1/orders
+Session
+Tạo đơn hàng
+orders,order_items,payments,shipments,product_variants,inventory_movements
+API-035
+GET
+/api/v1/orders
+Customer
+Đơn hàng của tôi
+orders
+API-036
+GET
+/api/v1/orders/{id}
+Customer/Token
+Chi tiết đơn hàng
+orders,order_items,payments,shipments
+API-037
+POST
+/api/v1/orders/{id}/cancel
+Customer
+Hủy đơn đủ điều kiện
+orders,inventory_movements,product_variants
+API-038
+POST
+/api/v1/orders/{id}/reorder
+Customer
+Tạo giỏ từ đơn cũ
+orders,order_items,carts,cart_items
+API-039
+GET
+/api/v1/admin/products
+Admin
+Tìm sản phẩm phía Admin
+products,product_variants
+API-040
+POST
+/api/v1/admin/products
+Admin
+Tạo sản phẩm
+products,product_images,audit_logs
+API-041
+PATCH
+/api/v1/admin/products/{id}
+Admin
+Cập nhật sản phẩm
+products,product_images,audit_logs
+API-042
+POST
+/api/v1/admin/products/{id}/variants
+Admin
+Tạo variant
+product_variants,audit_logs
+API-043
+PATCH
+/api/v1/admin/variants/{id}
+Admin
+Cập nhật variant
+product_variants,audit_logs
+API-044
+POST
+/api/v1/admin/inventory-adjustments
+Admin
+Điều chỉnh tồn kho
+product_variants,inventory_movements,audit_logs
+API-045
+GET
+/api/v1/admin/orders
+Admin
+Tìm đơn hàng phía Admin
+orders,users,payments,shipments
+API-046
+GET
+/api/v1/admin/orders/{id}
+Admin
+Chi tiết đơn phía Admin
+orders,order_items,payments,shipments
+API-047
+PATCH
+/api/v1/admin/orders/{id}/status
+Admin
+Cập nhật trạng thái đơn
+orders,audit_logs
+API-048
+PATCH
+/api/v1/admin/orders/{id}/shipment
+Admin
+Cập nhật giao hàng
+shipments,orders,audit_logs
+API-049
+PATCH
+/api/v1/admin/orders/{id}/payment
+Admin
+Cập nhật thu tiền COD
+payments,payment_transactions,audit_logs
+API-050
+GET
+/api/v1/admin/promotions
+Admin
+Danh sách promotion
+promotions,promotion_usages
+API-051
+POST
+/api/v1/admin/promotions
+Admin
+Tạo promotion
+promotions,audit_logs
+API-052
+PATCH
+/api/v1/admin/promotions/{id}
+Admin
+Cập nhật promotion
+promotions,audit_logs
+6.3 Contract mẫu của API quan trọng
+POST /api/v1/cart/items
+Request: {"variantId":"uuid","qty":1}
+Response 200: {"cartId":"uuid","items":[...],"subtotal":180,"discount":0,"total":180}
+POST /api/v1/checkout/shipping-quote
+Request: {"postcode":"2000","state":"NSW"}
+Response 200: {"methods":[{"code":"STANDARD","fee":0,"eta":"3-5 business days"},{"code":"EXPRESS","fee":15,"eta":"1-2 business days"}]}
+POST /api/v1/payments/initiate
+Request: {"checkoutSessionId":"uuid","method":"CARD","paymentToken":"sim_tok_xxx"}
+Response 200: {"paymentId":"uuid","status":"SUCCESS","amount":320.00}
+POST /api/v1/orders
+Headers: Idempotency-Key: 6d...
+Request: {"checkoutSessionId":"uuid"}
+Response 201: {"orderId":"uuid","orderNo":"AU102938","status":"PROCESSING","paymentStatus":"SUCCESS","total":320.00}
+6.4 Payment Simulator
+Hạng mục
+Mô tả
+CARD
+Nhận token mô phỏng; kịch bản mô phỏng có thể trả SUCCESS hoặc DECLINED. Không lưu raw CVV/full card number.
+PayPal
+Tạo PENDING + mock redirect; callback Confirm/Cancel cập nhật status.
+Afterpay
+Kiểm tra amount range, hiển thị Pay in 4; kết quả phê duyệt mô phỏng/decline.
+COD
+Không thu tiền tại checkout; payment=PENDING_COLLECTION, sau giao hàng Admin xác nhận payment=PAID.
+7. Thiết kế Database
+
+                         Hình 7.1 · ERD tổng quan
+7.1 Nguyên tắc dữ liệu
+ Primary key dùng UUID.
+ Các mã người dùng nhìn thấy như order_no, SKU, promotion code có unique constraint phù hợp.
+ Stock không bao giờ âm; mọi biến động stock phải có inventory_movements.
+ Order và OrderItem lưu snapshot dữ liệu thương mại tại thời điểm đặt hàng.
+ Không hard-delete dữ liệu có lịch sử giao dịch; dùng status/inactive.
+ Các thao tác Admin quan trọng ghi audit_logs.
+7.2 Danh mục bảng
+Bảng
+Vai trò
+Nhóm
+users
+Tài khoản Customer/Admin
+Account
+password_reset_tokens
+Token reset password
+Account
+addresses
+Sổ địa chỉ
+Account
+brands
+Danh mục brand
+Catalog
+categories
+Danh mục phân cấp
+Catalog
+products
+Nhóm sản phẩm
+Catalog
+product_categories
+Liên kết product-category
+Catalog
+product_variants
+SKU, size, price, stock
+Catalog
+product_images
+Ảnh sản phẩm
+Catalog
+carts
+Giỏ hàng
+Cart
+cart_items
+Dòng giỏ
+Cart
+wishlists
+Wishlist header
+Wishlist
+wishlist_items
+Wishlist item
+Wishlist
+promotions
+Rule voucher
+Promotion
+promotion_usages
+Lịch sử dùng voucher
+Promotion
+checkout_sessions
+Trạng thái checkout tạm
+Checkout
+orders
+Order header
+Order
+order_items
+Dòng sản phẩm snapshot của đơn
+Order
+payments
+Thông tin thanh toán tổng
+Payment
+payment_transactions
+Lịch sử sự kiện thanh toán
+Payment
+shipments
+Fulfilment
+Order
+inventory_movements
+Sổ biến động tồn kho
+Inventory
+audit_logs
+Audit hành động Admin
+Admin
+7.3 Data Dictionary
+users
+Vai trò bảng: Lưu tài khoản Customer/Admin. Là bảng gốc cho addresses, orders, wishlists và audit_logs.
+Quan hệ chính: 1-N addresses, 1-N orders, 1-1/N wishlists, 1-N audit_logs
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID người dùng
+email
+varchar(255)
+UQ, NOT NULL
+Email đăng nhập
+password_hash
+varchar(255)
+NOT NULL
+Mật khẩu đã hash
+first_name
+varchar(100)
+NOT NULL
+Tên
+last_name
+varchar(100)
+NOT NULL
+Họ
+phone
+varchar(30)
+NULL
+Số điện thoại
+role
+varchar(20)
+NOT NULL
+CUSTOMER/ADMIN
+status
+varchar(20)
+NOT NULL
+ACTIVE/DISABLED/LOCKED
+created_at
+timestamptz
+NOT NULL
+Ngày tạo
+password_reset_tokens
+Vai trò bảng: Quản lý vòng đời token đặt lại mật khẩu; token thô không được lưu.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID token
+user_id
+uuid
+FK
+Người dùng
+token_hash
+varchar(255)
+UQ
+Hash token
+expires_at
+timestamptz
+NOT NULL
+Hết hạn
+used_at
+timestamptz
+NULL
+Đã dùng lúc
+addresses
+Vai trò bảng: Sổ địa chỉ của Customer. Checkout sẽ copy dữ liệu thành shipping_address_json để tạo snapshot.
+Quan hệ chính: N-1 users
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID địa chỉ
+user_id
+uuid
+FK
+Chủ sở hữu
+label
+varchar(50)
+NULL
+Home/Work
+full_name
+varchar(200)
+NOT NULL
+Người nhận
+phone
+varchar(30)
+NOT NULL
+Điện thoại
+line1
+varchar(255)
+NOT NULL
+Địa chỉ dòng 1
+suburb
+varchar(120)
+NOT NULL
+Suburb
+state
+varchar(3)
+NOT NULL
+NSW/VIC/...
+postcode
+varchar(4)
+NOT NULL
+Postcode AU
+country
+char(2)
+NOT NULL
+AU
+is_default
+boolean
+NOT NULL
+Địa chỉ mặc định
+brands
+Vai trò bảng: Danh mục thương hiệu; products.brand_id tham chiếu tới bảng này.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID brand
+name
+varchar(120)
+UQ
+Tên brand
+slug
+varchar(140)
+UQ
+URL slug
+status
+varchar(20)
+NOT NULL
+ACTIVE/INACTIVE
+categories
+Vai trò bảng: Danh mục phân cấp bằng parent_id; liên kết product qua product_categories.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID category
+name
+varchar(120)
+NOT NULL
+Tên
+slug
+varchar(140)
+UQ
+Slug
+parent_id
+uuid
+FK NULL
+Danh mục cha
+status
+varchar(20)
+NOT NULL
+ACTIVE/INACTIVE
+products
+Vai trò bảng: Thông tin cấp product family; chưa phải SKU bán hàng cụ thể.
+Quan hệ chính: N-1 brands; M-N categories; 1-N product_variants; 1-N product_images
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID sản phẩm
+brand_id
+uuid
+FK
+Brand
+name
+varchar(255)
+NOT NULL
+Tên sản phẩm
+slug
+varchar(255)
+UQ
+Slug
+description
+text
+NULL
+Mô tả
+status
+varchar(20)
+NOT NULL
+DRAFT/ACTIVE/INACTIVE
+created_at
+timestamptz
+NOT NULL
+Ngày tạo
+product_categories
+Vai trò bảng: Bảng nối many-to-many giữa products và categories.
+Column
+Type
+Constraint
+Ý nghĩa
+product_id
+uuid
+PK,FK
+Sản phẩm
+category_id
+uuid
+PK,FK
+Danh mục
+product_variants
+Vai trò bảng: Đơn vị bán hàng thực tế (SKU), chứa colour/size/price/stock. Phần lớn cart/order/inventory thao tác ở cấp variant.
+Quan hệ chính: N-1 products; 1-N cart_items/order_items/wishlist_items/inventory_movements
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID biến thể
+product_id
+uuid
+FK
+Sản phẩm
+sku
+varchar(80)
+UQ
+SKU
+colour
+varchar(80)
+NOT NULL
+Màu
+size
+varchar(30)
+NOT NULL
+Size AU
+price
+numeric(12,2)
+NOT NULL
+Giá gốc
+sale_price
+numeric(12,2)
+NULL
+Giá sale
+stock_qty
+int
+NOT NULL
+Tồn khả dụng
+status
+varchar(20)
+NOT NULL
+ACTIVE/INACTIVE
+product_images
+Vai trò bảng: Danh sách ảnh của product; is_primary xác định ảnh đại diện.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID ảnh
+product_id
+uuid
+FK
+Sản phẩm
+url
+text
+NOT NULL
+Ảnh
+sort_order
+int
+NOT NULL
+Thứ tự
+is_primary
+boolean
+NOT NULL
+Ảnh chính
+carts
+Vai trò bảng: Giỏ hàng header của user/session; promotion_id là promotion đang áp dụng.
+Quan hệ chính: 1-N cart_items; N-1 users (nullable cho guest/session); N-1 promotions
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID giỏ
+user_id
+uuid
+FK NULL
+User nếu login
+session_key
+varchar(120)
+NULL
+Guest session
+promotion_id
+uuid
+FK NULL
+Promotion đang áp
+status
+varchar(20)
+NOT NULL
+ACTIVE/CONVERTED/ABANDONED
+updated_at
+timestamptz
+NOT NULL
+Cập nhật
+cart_items
+Vai trò bảng: Các dòng hàng trong giỏ, trỏ tới product_variants và giữ qty.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID line
+cart_id
+uuid
+FK
+Giỏ
+variant_id
+uuid
+FK
+SKU
+qty
+int
+NOT NULL
+Số lượng
+created_at
+timestamptz
+NOT NULL
+Ngày thêm
+wishlists
+Vai trò bảng: Wishlist header theo user.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID wishlist
+user_id
+uuid
+FK,UQ
+User
+wishlist_items
+Vai trò bảng: Các variant được lưu trong wishlist.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID item
+wishlist_id
+uuid
+FK
+Wishlist
+variant_id
+uuid
+FK
+SKU
+created_at
+timestamptz
+NOT NULL
+Ngày lưu
+promotions
+Vai trò bảng: Định nghĩa mã giảm giá và điều kiện hiệu lực.
+Quan hệ chính: 1-N promotion_usages; 1-N carts
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID promotion
+code
+varchar(50)
+UQ
+Mã
+type
+varchar(20)
+NOT NULL
+PERCENT/FIXED
+value
+numeric(12,2)
+NOT NULL
+Giá trị
+min_spend
+numeric(12,2)
+NULL
+Chi tối thiểu
+starts_at
+timestamptz
+NOT NULL
+Bắt đầu
+ends_at
+timestamptz
+NOT NULL
+Kết thúc
+usage_limit
+int
+NULL
+Giới hạn
+enabled
+boolean
+NOT NULL
+Bật/tắt
+promotion_usages
+Vai trò bảng: Audit việc promotion đã được sử dụng bởi user/order.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID usage
+promotion_id
+uuid
+FK
+Promotion
+user_id
+uuid
+FK NULL
+User
+order_id
+uuid
+FK
+Order
+used_at
+timestamptz
+NOT NULL
+Thời điểm dùng
+checkout_sessions
+Vai trò bảng: Trạng thái tạm thời trong quá trình checkout; có expires_at và snapshot address/method/fee.
+Quan hệ chính: N-1 carts/users; nguồn tạo orders
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+Checkout ID
+cart_id
+uuid
+FK
+Giỏ
+user_id
+uuid
+FK NULL
+User
+shipping_address_json
+jsonb
+NULL
+Snapshot địa chỉ
+shipping_method
+varchar(30)
+NULL
+STANDARD/EXPRESS
+shipping_fee
+numeric(12,2)
+NULL
+Phí ship
+payment_method
+varchar(30)
+NULL
+CARD/PAYPAL/AFTERPAY/COD
+expires_at
+timestamptz
+NOT NULL
+Hết hạn
+orders
+Vai trò bảng: Order header bất biến về tiền và địa chỉ snapshot sau khi Place Order.
+Quan hệ chính: N-1 users; 1-N order_items; 1-N payments; 1-1/N shipments
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID order
+order_no
+varchar(30)
+UQ
+Mã hiển thị
+user_id
+uuid
+FK NULL
+Customer
+status
+varchar(30)
+NOT NULL
+Order state
+payment_status
+varchar(30)
+NOT NULL
+Payment state
+subtotal
+numeric(12,2)
+NOT NULL
+Tạm tính
+discount
+numeric(12,2)
+NOT NULL
+Giảm giá
+shipping_fee
+numeric(12,2)
+NOT NULL
+Phí ship
+total
+numeric(12,2)
+NOT NULL
+Tổng trả
+shipping_address_json
+jsonb
+NOT NULL
+Snapshot địa chỉ
+idempotency_key
+varchar(100)
+UQ
+Chống tạo trùng
+created_at
+timestamptz
+NOT NULL
+Ngày đặt
+order_items
+Vai trò bảng: Snapshot item tại thời điểm mua; không phụ thuộc tên/giá catalog thay đổi sau này.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID item
+order_id
+uuid
+FK
+Order
+variant_id
+uuid
+FK NULL
+Variant hiện tại
+sku_snapshot
+varchar(80)
+NOT NULL
+SKU lúc mua
+name_snapshot
+varchar(255)
+NOT NULL
+Tên lúc mua
+size_snapshot
+varchar(30)
+NOT NULL
+Size lúc mua
+unit_price
+numeric(12,2)
+NOT NULL
+Đơn giá
+qty
+int
+NOT NULL
+Số lượng
+line_total
+numeric(12,2)
+NOT NULL
+Thành tiền
+payments
+Vai trò bảng: Payment aggregate của checkout/order; tách riêng method và status khỏi order lifecycle.
+Quan hệ chính: N-1 orders hoặc checkout_sessions; 1-N payment_transactions
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID payment
+order_id
+uuid
+FK NULL
+Order
+checkout_session_id
+uuid
+FK NULL
+Checkout
+method
+varchar(30)
+NOT NULL
+CARD/PAYPAL/AFTERPAY/COD
+status
+varchar(30)
+NOT NULL
+INITIATED/PENDING/SUCCESS/DECLINED/PENDING_COLLECTION/PAID
+amount
+numeric(12,2)
+NOT NULL
+Số tiền
+last4
+varchar(4)
+NULL
+4 số cuối mô phỏng
+provider_ref
+varchar(120)
+NULL
+Reference mô phỏng
+payment_transactions
+Vai trò bảng: Event log cho từng payment attempt/callback/result.
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID event
+payment_id
+uuid
+FK
+Payment
+event
+varchar(40)
+NOT NULL
+INITIATE/CALLBACK/COLLECT
+result_code
+varchar(60)
+NULL
+Kết quả
+payload_json
+jsonb
+NULL
+Metadata an toàn
+created_at
+timestamptz
+NOT NULL
+Thời điểm
+shipments
+Vai trò bảng: Trạng thái fulfilment/giao hàng, tracking và các mốc shipped/delivered.
+Quan hệ chính: N-1 orders
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID shipment
+order_id
+uuid
+FK,UQ
+Order
+method
+varchar(30)
+NOT NULL
+STANDARD/EXPRESS
+status
+varchar(30)
+NOT NULL
+PENDING/SHIPPED/DELIVERED
+tracking_no
+varchar(100)
+NULL
+Tracking
+shipped_at
+timestamptz
+NULL
+Gửi lúc
+delivered_at
+timestamptz
+NULL
+Giao lúc
+inventory_movements
+Vai trò bảng: Sổ cái biến động tồn kho; mọi tăng/giảm quan trọng đều cần movement để audit.
+Quan hệ chính: N-1 product_variants
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID movement
+variant_id
+uuid
+FK
+SKU
+type
+varchar(40)
+NOT NULL
+ORDER/ORDER_CANCEL/MANUAL_ADJUSTMENT
+qty_delta
+int
+NOT NULL
+Biến động +/-
+ref_type
+varchar(40)
+NULL
+Loại reference
+ref_id
+uuid
+NULL
+Reference ID
+reason
+varchar(255)
+NULL
+Lý do
+created_at
+timestamptz
+NOT NULL
+Thời điểm
+audit_logs
+Vai trò bảng: Theo dõi thay đổi quản trị quan trọng với before_json/after_json.
+Quan hệ chính: N-1 users qua actor_user_id
+Column
+Type
+Constraint
+Ý nghĩa
+id
+uuid
+PK
+ID audit
+actor_user_id
+uuid
+FK NULL
+Người thao tác
+entity_type
+varchar(60)
+NOT NULL
+Loại entity
+entity_id
+uuid
+NOT NULL
+ID entity
+action
+varchar(60)
+NOT NULL
+CREATE/UPDATE/STATUS_CHANGE
+before_json
+jsonb
+NULL
+Trước
+after_json
+jsonb
+NULL
+Sau
+created_at
+timestamptz
+NOT NULL
+Thời điểm
+7.4 Quy ước thao tác dữ liệu và transaction
+READ: đọc dữ liệu để hiển thị hoặc validate; không làm thay đổi state.
+INSERT: tạo record mới; mọi khóa ngoại, unique constraint và NOT NULL phải được kiểm tra tại service/DB.
+UPDATE: thay đổi record hiện hữu; các entity có state machine phải validate transition trước khi update.
+DELETE: chỉ dùng với dữ liệu tạm/quan hệ được phép xóa; dữ liệu giao dịch quan trọng ưu tiên status/audit thay vì hard delete.
+Các nghiệp vụ nhiều bảng như Place Order, Cancel Order và Inventory Adjustment phải xác định rõ transaction boundary để tránh dữ liệu nửa chừng.
+8. Ma trận liên kết Chức năng --> Màn hình --> API --> DB
+Bảng này là điểm tra cứu nhanh giữa yêu cầu nghiệp vụ và phần triển khai tương ứng.
+Mã chức năng
+Module
+Chức năng
+Màn hình
+API
+DB
+F01
+Khám phá sản phẩm
+Trang chủ và điều hướng
+SC-01_Home
+GET /api/v1/home
+GET /api/v1/cart/summary
+products, brands, categories, carts
+F02
+Khám phá sản phẩm
+Tìm kiếm sản phẩm
+SC-02_PLP
+GET /api/v1/products?q=
+products, brands, product_variants
+F03
+Khám phá sản phẩm
+Điều hướng danh mục và thương hiệu
+SC-01_Home
+GET /api/v1/categories
+GET /api/v1/brands
+GET /api/v1/products
+categories, brands, products
+F04
+Khám phá sản phẩm
+Danh sách sản phẩm (PLP)
+SC-02_PLP
+GET /api/v1/products
+products, product_variants, product_images
+F05
+Khám phá sản phẩm
+Lọc, sắp xếp và phân trang
+SC-02_PLP
+GET /api/v1/products?brand=&size=&minPrice=&maxPrice=&sort=&page=
+products, product_variants, brands
+F06
+Khám phá sản phẩm
+Chi tiết sản phẩm và lựa chọn biến thể
+SC-03_PDP
+GET /api/v1/products/{slug}
+products, product_variants, product_images
+F07
+Tài khoản
+Đăng ký tài khoản
+SC-15_Register
+POST /api/v1/auth/register
+users
+F08
+Tài khoản
+Đăng nhập
+SC-04_Login
+POST /api/v1/auth/login
+GET /api/v1/me
+users
+F09
+Tài khoản
+Đăng xuất
+SC-04_Login
+POST /api/v1/auth/logout
+users
+F10
+Tài khoản
+Quên và đặt lại mật khẩu
+SC-16_ForgotPassword
+POST /api/v1/auth/forgot-password
+POST /api/v1/auth/reset-password
+users, password_reset_tokens
+F11
+Tài khoản
+Quản lý hồ sơ cá nhân
+SC-17_Profile
+GET /api/v1/me
+PATCH /api/v1/me
+users
+F12
+Tài khoản
+Sổ địa chỉ
+SC-18_AddressBook
+GET /api/v1/addresses
+POST /api/v1/addresses
+PATCH /api/v1/addresses/{id}
+DELETE /api/v1/addresses/{id}
+addresses, users
+F13
+Wishlist & Giỏ hàng
+Wishlist
+SC-11_Wishlist
+GET /api/v1/wishlist
+POST /api/v1/wishlist/items
+DELETE /api/v1/wishlist/items/{id}
+wishlists, wishlist_items, product_variants
+F14
+Wishlist & Giỏ hàng
+Thêm sản phẩm vào giỏ
+SC-03_PDP
+POST /api/v1/cart/items
+carts, cart_items, product_variants
+F15
+Wishlist & Giỏ hàng
+Xem giỏ hàng
+SC-05_Cart
+GET /api/v1/cart
+carts, cart_items, product_variants, promotions
+F16
+Wishlist & Giỏ hàng
+Cập nhật số lượng trong giỏ
+SC-05_Cart
+PATCH /api/v1/cart/items/{id}
+cart_items, product_variants
+F17
+Wishlist & Giỏ hàng
+Xóa sản phẩm khỏi giỏ
+SC-05_Cart
+DELETE /api/v1/cart/items/{id}
+cart_items, carts
+F18
+Wishlist & Giỏ hàng
+Áp dụng và gỡ mã khuyến mãi
+SC-05_Cart
+POST /api/v1/cart/promotion
+DELETE /api/v1/cart/promotion
+promotions, promotion_usages, carts, cart_items
+F19
+Checkout & Thanh toán
+Khởi tạo checkout
+SC-06_Shipping
+POST /api/v1/checkout/init
+checkout_sessions, carts, cart_items, users, addresses
+F20
+Checkout & Thanh toán
+Nhập địa chỉ giao hàng
+SC-06_Shipping
+PATCH /api/v1/checkout/shipping-address
+checkout_sessions, addresses
+F21
+Checkout & Thanh toán
+Chọn phương thức giao hàng
+SC-06_Shipping
+POST /api/v1/checkout/shipping-quote
+checkout_sessions
+F22
+Checkout & Thanh toán
+Chọn phương thức thanh toán
+SC-07_Payment
+GET /api/v1/payment-methods
+PATCH /api/v1/checkout/payment-method
+checkout_sessions
+F23
+Checkout & Thanh toán
+Thanh toán bằng Credit / Debit Card
+SC-07_Payment
+POST /api/v1/payments/initiate
+payments, payment_transactions, checkout_sessions
+F24
+Checkout & Thanh toán
+Thanh toán bằng PayPal
+SC-07_Payment
+POST /api/v1/payments/initiate
+GET /api/v1/payments/{id}
+payments, payment_transactions
+F25
+Checkout & Thanh toán
+Thanh toán bằng Afterpay
+SC-07_Payment
+POST /api/v1/payments/initiate
+GET /api/v1/payments/{id}
+payments, payment_transactions
+F26
+Checkout & Thanh toán
+Thanh toán khi nhận hàng (COD)
+SC-07_Payment
+POST /api/v1/payments/initiate
+payments, checkout_sessions
+F27
+Checkout & Thanh toán
+Review và Place Order
+SC-08_Review
+GET /api/v1/checkout/review
+POST /api/v1/orders
+checkout_sessions, orders, order_items, product_variants, inventory_movements, payments, shipments
+F28
+Checkout & Thanh toán
+Xác nhận đơn hàng
+SC-09_Confirmation
+GET /api/v1/orders/{id}
+orders, order_items, payments, shipments
+F29
+Đơn hàng khách hàng
+Danh sách đơn hàng của tôi
+SC-10_MyOrders
+GET /api/v1/orders
+orders
+F30
+Đơn hàng khách hàng
+Chi tiết đơn hàng
+SC-19_OrderDetail
+GET /api/v1/orders/{id}
+orders, order_items, payments, shipments
+F31
+Đơn hàng khách hàng
+Hủy đơn hàng
+SC-19_OrderDetail
+POST /api/v1/orders/{id}/cancel
+orders, order_items, inventory_movements, product_variants, payments
+F32
+Đơn hàng khách hàng
+Mua lại (Buy Again)
+SC-19_OrderDetail
+POST /api/v1/orders/{id}/reorder
+orders, order_items, carts, cart_items, product_variants
+F33
+Admin · Sản phẩm & tồn kho
+Danh sách và tìm kiếm sản phẩm
+SC-12_AdminProducts
+GET /api/v1/admin/products
+products, brands, product_variants
+F34
+Admin · Sản phẩm & tồn kho
+Tạo và cập nhật sản phẩm
+SC-20_AdminProductForm
+POST /api/v1/admin/products
+PATCH /api/v1/admin/products/{id}
+products, brands, product_images, audit_logs
+F35
+Admin · Sản phẩm & tồn kho
+Quản lý biến thể, SKU và giá
+SC-20_AdminProductForm
+POST /api/v1/admin/products/{id}/variants
+PATCH /api/v1/admin/variants/{id}
+product_variants, products, audit_logs
+F36
+Admin · Sản phẩm & tồn kho
+Điều chỉnh tồn kho
+SC-12_AdminProducts
+POST /api/v1/admin/inventory-adjustments
+product_variants, inventory_movements, audit_logs
+F37
+Admin · Đơn hàng
+Danh sách và chi tiết đơn hàng
+SC-13_AdminOrders
+GET /api/v1/admin/orders
+GET /api/v1/admin/orders/{id}
+orders, order_items, payments, shipments, users
+F38
+Admin · Đơn hàng
+Cập nhật fulfilment, giao hàng và thu COD
+SC-13_AdminOrders
+PATCH /api/v1/admin/orders/{id}/status
+PATCH /api/v1/admin/orders/{id}/shipment
+PATCH /api/v1/admin/orders/{id}/payment
+orders, shipments, payments, payment_transactions, audit_logs
+F39
+Admin · Khuyến mãi
+Danh sách khuyến mãi
+SC-14_AdminPromotions
+GET /api/v1/admin/promotions
+promotions, promotion_usages
+F40
+Admin · Khuyến mãi
+Tạo và cập nhật khuyến mãi
+SC-14_AdminPromotions
+POST /api/v1/admin/promotions
+PATCH /api/v1/admin/promotions/{id}
+promotions, promotion_usages, audit_logs
+9. Yêu cầu phi chức năng
+ Responsive: ưu tiên desktop 1440px nhưng hỗ trợ mobile web.
+ Performance: PLP/PDP và cart API mục tiêu p95 < 800ms trong môi trường nội bộ thông thường.
+ Security: TLS, password hashing, rate limit auth, quyền sở hữu dữ liệu check, role authorization, không log secret/payment raw data.
+ Consistency: transaction cho Place Order, Cancel/Restock và Inventory Adjustment.
+ Observability: correlationId trong lỗi, structured log và audit admin.
+ Accessibility: form label rõ ràng, keyboard focus, contrast và alt text cho product image.
+10. Thứ tự phát triển đề xuất
+1. Foundation: DB migration, auth/session, seed catalog.
+2. Catalog: Home --> PLP/Search --> PDP.
+3. Account: Register/Login/Profile/Address.
+4. Cart/Wishlist/Promotion.
+5. Checkout: Shipping + Shipping Quote.
+6. Payment Simulator: Card --> PayPal --> Afterpay --> COD.
+7. Place Order + Confirmation + My Orders.
+8. Admin Product/Variant/Inventory.
+9. Admin Order/Fulfilment/COD.
+10. Admin Promotion + audit.
+Phụ lục A. Thuật ngữ
+Hạng mục
+Mô tả
+PDP
+Product Detail Page
+PLP
+Product Listing Page
+SKU
+Stock Keeping Unit - một biến thể bán cụ thể
+COD
+Cash on Delivery - thanh toán khi nhận hàng
+BNPL
+Buy Now Pay Later; trong tài liệu là Afterpay
+Snapshot
+Dữ liệu được sao chép tại thời điểm giao dịch để lịch sử không đổi
+Idempotency-Key
+Khóa chống tạo trùng khi retry request tạo order
+Fulfilment
+Quá trình chuẩn bị, gửi và giao đơn hàng
+
