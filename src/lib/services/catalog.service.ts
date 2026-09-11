@@ -127,12 +127,13 @@ export class CatalogService {
   static async searchProducts(
     query: string,
     brand_id?: string,
-    _min_price?: number,
-    _max_price?: number,
-    _category_id?: string,
+    min_price?: number,
+    max_price?: number,
+    category_id?: string,
     sort_by: string = "newest",
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
+    in_stock?: boolean
   ): Promise<{
     products: Product[];
     total: number;
@@ -143,7 +144,6 @@ export class CatalogService {
       const supabase = await createClient();
       const offset = (page - 1) * limit;
 
-      // Build query
       let queryBuilder = supabase
         .from("products")
         .select(
@@ -158,7 +158,6 @@ export class CatalogService {
         )
         .eq("status", "ACTIVE");
 
-      // Apply filters
       if (query) {
         queryBuilder = queryBuilder.ilike("name", `%${query}%`);
       }
@@ -167,7 +166,6 @@ export class CatalogService {
         queryBuilder = queryBuilder.eq("brand_id", brand_id);
       }
 
-      // Sort
       if (sort_by === "price_asc") {
         queryBuilder = queryBuilder.order("id");
       } else if (sort_by === "price_desc") {
@@ -176,7 +174,6 @@ export class CatalogService {
         queryBuilder = queryBuilder.order("created_at", { ascending: false });
       }
 
-      // Pagination
       queryBuilder = queryBuilder.range(offset, offset + limit - 1);
 
       const { data: products, error, count } = await queryBuilder;
@@ -188,9 +185,30 @@ export class CatalogService {
         };
       }
 
+      let filtered = products || [];
+
+      if (min_price !== undefined || max_price !== undefined) {
+        filtered = filtered.filter((product) => {
+          const prices = product.product_variants
+            .filter((v) => v.status === "ACTIVE")
+            .map((v) => (v.sale_price !== null ? v.sale_price : v.price));
+          if (!prices.length) return false;
+          const minVariantPrice = Math.min(...prices);
+          if (min_price !== undefined && minVariantPrice < min_price) return false;
+          if (max_price !== undefined && minVariantPrice > max_price) return false;
+          return true;
+        });
+      }
+
+      if (in_stock) {
+        filtered = filtered.filter((product) =>
+          product.product_variants.some((v) => v.status === "ACTIVE" && v.stock_qty > 0)
+        );
+      }
+
       return {
-        products: this.formatProducts(products),
-        total: count || 0,
+        products: this.formatProducts(filtered),
+        total: filtered.length,
         page,
         limit,
       };

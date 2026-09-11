@@ -8,12 +8,13 @@ export async function GET(req: NextRequest) {
     const query = searchParams.get("q") || "";
     const brand_id = searchParams.get("brand_id") || undefined;
     const category_id = searchParams.get("category_id") || undefined;
-    const min_price = searchParams.get("min_price")
-      ? parseInt(searchParams.get("min_price")!)
+    const min_price = searchParams.get("minPrice")
+      ? parseInt(searchParams.get("minPrice")!)
       : undefined;
-    const max_price = searchParams.get("max_price")
-      ? parseInt(searchParams.get("max_price")!)
+    const max_price = searchParams.get("maxPrice")
+      ? parseInt(searchParams.get("maxPrice")!)
       : undefined;
+    const in_stock = searchParams.get("inStock") === "true";
     const sort_by = searchParams.get("sort_by") || "newest";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -26,7 +27,8 @@ export async function GET(req: NextRequest) {
       category_id,
       sort_by,
       page,
-      limit
+      limit,
+      in_stock
     );
 
     if ("code" in result) {

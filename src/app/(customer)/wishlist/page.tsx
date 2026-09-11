@@ -6,7 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
+import { Heart, ShoppingBag } from "lucide-react";
 
 interface WishlistItem {
   id: string;
@@ -60,7 +62,7 @@ export default function WishlistPage() {
     });
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchWishlist();
-  }, []);
+  }, [fetchWishlist]);
 
   const handleRemoveItem = async (itemId: string) => {
     try {
@@ -95,18 +97,23 @@ export default function WishlistPage() {
   };
 
   if (loading) {
-    return <div className="py-12 text-center">Loading wishlist...</div>;
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="text-center">Loading wishlist...</div>
+      </div>
+    );
   }
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold">Sign in to Your Wishlist</h1>
-          <p className="mb-6 text-muted-foreground">
-            Create an account to save your favorite items
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 flex items-center">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 text-center w-full">
+          <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <h1 className="mb-2 text-3xl font-bold">Save Your Favorites</h1>
+          <p className="mb-8 text-muted-foreground">
+            Sign in to your account to save and manage your wishlist
           </p>
-          <Button asChild>
+          <Button size="lg" className="bg-accent hover:bg-accent/90 text-white" asChild>
             <Link href="/login">Sign In</Link>
           </Button>
         </div>
@@ -116,13 +123,14 @@ export default function WishlistPage() {
 
   if (!wishlist || wishlist.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold">Your Wishlist is Empty</h1>
-          <p className="mb-6 text-muted-foreground">
-            Add items to your wishlist by clicking the heart icon
+      <div className="min-h-screen bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 text-center">
+          <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <h1 className="mb-2 text-3xl font-bold">Your Wishlist is Empty</h1>
+          <p className="mb-8 text-muted-foreground">
+            Add items to your wishlist by clicking the heart icon on product pages
           </p>
-          <Button asChild>
+          <Button size="lg" className="bg-accent hover:bg-accent/90 text-white" asChild>
             <Link href="/products">Browse Products</Link>
           </Button>
         </div>
@@ -143,78 +151,93 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold">My Wishlist</h1>
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="mb-2 text-4xl font-bold tracking-tight">My Wishlist</h1>
+          <p className="text-muted-foreground">{wishlist.items.length} item{wishlist.items.length !== 1 ? 's' : ''} saved</p>
+        </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {wishlist.items.map((item) => {
-          const effectivePrice = getEffectivePrice(item);
-          const originalPrice = getOriginalPrice(item);
-          const onSale = hasSale(item);
-          const inStock = item.stock_qty > 0;
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {wishlist.items.map((item) => {
+            const effectivePrice = getEffectivePrice(item);
+            const originalPrice = getOriginalPrice(item);
+            const onSale = hasSale(item);
+            const inStock = item.stock_qty > 0;
 
-          return (
-            <Card key={item.id} className="overflow-hidden">
-              {/* Image */}
-              {item.image_url && (
-                <div className="relative aspect-square bg-muted overflow-hidden">
-                  <Image
-                    src={item.image_url}
-                    alt={item.product_name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-
-              <CardContent className="p-4">
-                <Link
-                  href={`/products/${item.variant_sku}`}
-                  className="font-semibold hover:underline line-clamp-2"
-                >
-                  {item.product_name}
-                </Link>
-
-                <p className="text-sm text-muted-foreground">
-                  {item.colour} / {item.size}
-                </p>
-
-                <div className="my-3 flex items-center gap-2">
-                  <span className="font-bold">
-                    ${effectivePrice.toFixed(2)}
-                  </span>
+            return (
+              <Card key={item.id} className="overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
+                {/* Image */}
+                <div className="relative aspect-square bg-muted overflow-hidden group">
+                  {item.image_url && (
+                    <Image
+                      src={item.image_url}
+                      alt={item.product_name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
+                    />
+                  )}
                   {onSale && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      ${originalPrice.toFixed(2)}
-                    </span>
+                    <Badge className="absolute top-3 right-3 bg-red-500 hover:bg-red-600">
+                      Sale
+                    </Badge>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Button
-                    size="sm"
-                    className="w-full"
-                    disabled={!inStock}
-                    onClick={() =>
-                      handleAddToCart(item.variant_id)
-                    }
+                <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                  <Link
+                    href={`/products/${item.variant_sku}`}
+                    className="font-semibold hover:text-accent transition-colors line-clamp-2 text-sm"
                   >
-                    {inStock ? "Add to Cart" : "Out of Stock"}
-                  </Button>
+                    {item.product_name}
+                  </Link>
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => handleRemoveItem(item.id)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {item.colour} • Size {item.size}
+                  </p>
+
+                  <div className="my-3 flex items-center gap-2">
+                    <span className="font-bold text-accent text-lg">
+                      ${effectivePrice.toFixed(2)}
+                    </span>
+                    {onSale && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        ${originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 mt-auto">
+                    <Button
+                      size="sm"
+                      className={`w-full font-semibold h-9 ${inStock ? "bg-accent hover:bg-accent/90 text-white" : "bg-muted text-muted-foreground"}`}
+                      disabled={!inStock}
+                      onClick={() => handleAddToCart(item.variant_id)}
+                    >
+                      {inStock ? (
+                        <>
+                          <ShoppingBag className="h-4 w-4 mr-1" />
+                          Add to Cart
+                        </>
+                      ) : (
+                        "Out of Stock"
+                      )}
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full font-semibold h-9"
+                      onClick={() => handleRemoveItem(item.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

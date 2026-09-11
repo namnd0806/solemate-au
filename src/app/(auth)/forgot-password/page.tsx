@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -46,34 +47,49 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/30 px-4 py-8">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="border-b space-y-2">
+          <CardTitle className="text-2xl">Reset Password</CardTitle>
           <CardDescription>
-            Enter your email to receive a password reset link
+            We&apos;ll send you a link to reset your password
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-6">
           {submitted ? (
             <div className="space-y-4">
-              <div className="rounded-md bg-green-50 p-4 text-sm text-green-700">
-                Check your email for a password reset link. If you don&apos;t see it,
-                check your spam folder.
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-green-50 p-3">
+                  <CheckCircle className="h-8 w-8 text-green-600" />
+                </div>
               </div>
-              <Link href="/login" className="block text-center text-primary hover:underline">
-                Back to Sign In
+              <div className="text-center space-y-2">
+                <h3 className="font-semibold text-foreground">Check your email</h3>
+                <p className="text-sm text-muted-foreground">
+                  We&apos;ve sent a password reset link to <span className="font-medium">{email}</span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  If you don&apos;t see it, check your spam folder.
+                </p>
+              </div>
+              <Link href="/login" className="block">
+                <Button variant="outline" className="w-full" type="button">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Sign In
+                </Button>
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-                  {error}
+                <div className="flex gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+                  <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-destructive font-medium">{error}</p>
                 </div>
               )}
+
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
+                <label htmlFor="email" className="text-sm font-semibold">
                   Email Address
                 </label>
                 <Input
@@ -83,16 +99,28 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="h-10"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter the email associated with your account
+                </p>
               </div>
-              <Button className="w-full" type="submit" disabled={loading}>
+
+              <Button
+                size="lg"
+                className="w-full bg-accent hover:bg-accent/90 text-white font-semibold"
+                type="submit"
+                disabled={loading}
+              >
                 {loading ? "Sending..." : "Send Reset Link"}
               </Button>
-              <div className="text-center text-sm">
-                <Link href="/login" className="text-primary hover:underline">
+
+              <Link href="/login" className="block">
+                <Button variant="ghost" className="w-full" type="button">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Sign In
-                </Link>
-              </div>
+                </Button>
+              </Link>
             </form>
           )}
         </CardContent>

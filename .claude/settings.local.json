@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git push *)",
+      "Bash(curl -s \"https://solemate-au.vercel.app/\")",
+      "Bash(curl -s \"https://solemate-au.vercel.app/api/v1/promotions\")",
+      "Bash(curl -v \"https://solemate-au.vercel.app/api/v1/brands\")",
+      "Bash(curl -s \"https://solemate-au.vercel.app/api/v1/admin/promotions\")",
+      "Bash(curl -s \"https://solemate-au.vercel.app/api/v1/categories\")",
+      "Bash(curl -s \"https://solemate-au.vercel.app/api/v1/products/nike-air-max-270\")",
+      "Bash(supabase db *)",
+      "Bash(cp /tmp/setup-demo.mjs .)",
+      "Bash(npx tsx *)"
+    ]
+  }
+}

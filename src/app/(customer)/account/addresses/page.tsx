@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,27 +40,25 @@ export default function AddressesPage() {
     is_default: false,
   });
 
-  const fetchAddresses = useCallback(async () => {
-    try {
-      const res = await fetch("/api/v1/addresses");
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Failed to load addresses");
-        setLoading(false);
-        return;
-      }
-
-      setAddresses(data.addresses || []);
-      setLoading(false);
-    } catch {
-      setError("Failed to load addresses");
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const fetchAddresses = async () => {
+      try {
+        const res = await fetch("/api/v1/addresses");
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || "Failed to load addresses");
+          setLoading(false);
+          return;
+        }
+
+        setAddresses(data.addresses || []);
+        setLoading(false);
+      } catch {
+        setError("Failed to load addresses");
+        setLoading(false);
+      }
+    };
     fetchAddresses();
   }, []);
 
@@ -129,196 +127,246 @@ export default function AddressesPage() {
     }
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="text-center">Loading addresses...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Address Book</h1>
-          <p className="text-muted-foreground">Manage your delivery addresses</p>
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="mb-2 text-4xl font-bold tracking-tight">Address Book</h1>
+            <p className="text-muted-foreground">Manage your delivery addresses</p>
+          </div>
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            className={`font-semibold h-10 ${showForm ? "variant-outline" : "bg-accent hover:bg-accent/90 text-white"}`}
+          >
+            {showForm ? "Cancel" : "+ Add Address"}
+          </Button>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "Add Address"}
-        </Button>
-      </div>
 
-      {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="mb-6 flex gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+            <div className="flex-1">
+              <p className="text-sm text-destructive font-medium">{error}</p>
+            </div>
+          </div>
+        )}
 
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Address</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Label</label>
-                  <Input
-                    name="label"
-                    value={formData.label}
-                    onChange={handleChange}
-                    placeholder="Home"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Full Name</label>
-                  <Input
-                    name="full_name"
-                    value={formData.full_name}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone</label>
-                  <Input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="0412345678"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Street Address</label>
-                  <Input
-                    name="line1"
-                    value={formData.line1}
-                    onChange={handleChange}
-                    placeholder="123 Main St"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Street Address 2</label>
-                <Input
-                  name="line2"
-                  value={formData.line2}
-                  onChange={handleChange}
-                  placeholder="Apt 4B (optional)"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Suburb</label>
-                  <Input
-                    name="suburb"
-                    value={formData.suburb}
-                    onChange={handleChange}
-                    placeholder="Sydney"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">State</label>
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="NSW">NSW</option>
-                    <option value="VIC">VIC</option>
-                    <option value="QLD">QLD</option>
-                    <option value="WA">WA</option>
-                    <option value="SA">SA</option>
-                    <option value="TAS">TAS</option>
-                    <option value="ACT">ACT</option>
-                    <option value="NT">NT</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Postcode</label>
-                  <Input
-                    name="postcode"
-                    value={formData.postcode}
-                    onChange={handleChange}
-                    placeholder="2000"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="is_default"
-                  checked={formData.is_default}
-                  onChange={handleChange}
-                  className="rounded"
-                />
-                <label className="text-sm font-medium">Set as default</label>
-              </div>
-
-              <Button type="submit" className="w-full">
-                Add Address
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid gap-4">
-        {addresses.length === 0 ? (
-          <Card>
+        {showForm && (
+          <Card className="mb-8 ring-1 ring-accent/20">
+            <CardHeader className="border-b">
+              <CardTitle>Add New Address</CardTitle>
+            </CardHeader>
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                No addresses yet. Add one to get started.
-              </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="label" className="text-sm font-semibold">
+                      Label
+                    </label>
+                    <Input
+                      id="label"
+                      name="label"
+                      value={formData.label}
+                      onChange={handleChange}
+                      placeholder="e.g., Home"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="full_name" className="text-sm font-semibold">
+                      Full Name
+                    </label>
+                    <Input
+                      id="full_name"
+                      name="full_name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      placeholder="John Doe"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="text-sm font-semibold">
+                      Phone
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="0412345678"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="line1" className="text-sm font-semibold">
+                      Street Address
+                    </label>
+                    <Input
+                      id="line1"
+                      name="line1"
+                      value={formData.line1}
+                      onChange={handleChange}
+                      placeholder="123 Main St"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="line2" className="text-sm font-semibold">
+                    Street Address Line 2 (Optional)
+                  </label>
+                  <Input
+                    id="line2"
+                    name="line2"
+                    value={formData.line2}
+                    onChange={handleChange}
+                    placeholder="Apt 4B, Suite 200, etc."
+                    className="h-10"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="suburb" className="text-sm font-semibold">
+                      Suburb
+                    </label>
+                    <Input
+                      id="suburb"
+                      name="suburb"
+                      value={formData.suburb}
+                      onChange={handleChange}
+                      placeholder="Sydney"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="text-sm font-semibold">
+                      State
+                    </label>
+                    <select
+                      id="state"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      className="h-10 rounded-md border px-3 py-2 bg-white text-sm font-medium"
+                    >
+                      <option value="NSW">NSW</option>
+                      <option value="VIC">VIC</option>
+                      <option value="QLD">QLD</option>
+                      <option value="WA">WA</option>
+                      <option value="SA">SA</option>
+                      <option value="TAS">TAS</option>
+                      <option value="ACT">ACT</option>
+                      <option value="NT">NT</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="postcode" className="text-sm font-semibold">
+                      Postcode
+                    </label>
+                    <Input
+                      id="postcode"
+                      name="postcode"
+                      value={formData.postcode}
+                      onChange={handleChange}
+                      placeholder="2000"
+                      required
+                      className="h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-accent/5 rounded-lg p-3 border border-accent/20">
+                  <input
+                    type="checkbox"
+                    id="is_default"
+                    name="is_default"
+                    checked={formData.is_default}
+                    onChange={handleChange}
+                    className="rounded"
+                  />
+                  <label htmlFor="is_default" className="text-sm font-medium cursor-pointer">
+                    Set as default address for deliveries
+                  </label>
+                </div>
+
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white font-semibold h-10" size="lg">
+                  Add Address
+                </Button>
+              </form>
             </CardContent>
           </Card>
-        ) : (
-          addresses.map((address) => (
-            <Card key={address.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      {address.label}
-                      {address.is_default && (
-                        <span className="rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground">
-                          Default
-                        </span>
-                      )}
-                    </CardTitle>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(address.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium">{address.full_name}</span>
+        )}
+
+        <div className="space-y-4">
+          {addresses.length === 0 ? (
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <p className="text-muted-foreground text-center">
+                  No addresses yet. Add your first delivery address to get started.
                 </p>
-                <p>{address.line1}</p>
-                {address.line2 && <p>{address.line2}</p>}
-                <p>
-                  {address.suburb}, {address.state} {address.postcode}
-                </p>
-                <p>{address.phone}</p>
               </CardContent>
             </Card>
-          ))
-        )}
+          ) : (
+            addresses.map((address) => (
+              <Card key={address.id} className="hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <CardTitle className="flex items-center gap-3">
+                        {address.label}
+                        {address.is_default && (
+                          <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent border border-accent/20">
+                            Default
+                          </span>
+                        )}
+                      </CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(address.id)}
+                      className="text-destructive hover:text-destructive/80 hover:bg-destructive/10 font-semibold"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="border-t pt-4 space-y-2 text-sm">
+                  <div>
+                    <p className="font-semibold text-foreground">{address.full_name}</p>
+                    <p className="text-muted-foreground">{address.phone}</p>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <p>{address.line1}</p>
+                    {address.line2 && <p>{address.line2}</p>}
+                    <p>
+                      {address.suburb} {address.state} {address.postcode}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { AlertCircle } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,6 +36,17 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (formData.password !== formData.password_confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -52,7 +64,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Redirect to login
       router.push("/login");
     } catch {
       setError("An error occurred. Please try again.");
@@ -61,22 +72,24 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Create Account</CardTitle>
-          <CardDescription>Sign up to start shopping</CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/30 px-4 py-8">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="border-b space-y-2">
+          <CardTitle className="text-2xl">Create Account</CardTitle>
+          <CardDescription>Join SoleMate to start shopping</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-6">
           <form onSubmit={handleRegister} className="space-y-4">
             {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-                {error}
+              <div className="flex gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+                <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-destructive font-medium">{error}</p>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label htmlFor="first_name" className="text-sm font-medium">
+                <label htmlFor="first_name" className="text-sm font-semibold">
                   First Name
                 </label>
                 <Input
@@ -86,10 +99,11 @@ export default function RegisterPage() {
                   value={formData.first_name}
                   onChange={handleChange}
                   required
+                  className="h-10"
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="last_name" className="text-sm font-medium">
+                <label htmlFor="last_name" className="text-sm font-semibold">
                   Last Name
                 </label>
                 <Input
@@ -99,12 +113,14 @@ export default function RegisterPage() {
                   value={formData.last_name}
                   onChange={handleChange}
                   required
+                  className="h-10"
                 />
               </div>
             </div>
+
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
+              <label htmlFor="email" className="text-sm font-semibold">
+                Email Address
               </label>
               <Input
                 id="email"
@@ -114,10 +130,12 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                className="h-10"
               />
             </div>
+
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+              <label htmlFor="password" className="text-sm font-semibold">
                 Password
               </label>
               <Input
@@ -128,13 +146,15 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                className="h-10"
               />
               <p className="text-xs text-muted-foreground">
-                Min 8 chars, letters and numbers required
+                Min 8 characters, letters and numbers
               </p>
             </div>
+
             <div className="space-y-2">
-              <label htmlFor="password_confirm" className="text-sm font-medium">
+              <label htmlFor="password_confirm" className="text-sm font-semibold">
                 Confirm Password
               </label>
               <Input
@@ -145,17 +165,27 @@ export default function RegisterPage() {
                 value={formData.password_confirm}
                 onChange={handleChange}
                 required
+                className="h-10"
               />
             </div>
-            <Button className="w-full" type="submit" disabled={loading}>
+
+            <Button
+              size="lg"
+              className="w-full bg-accent hover:bg-accent/90 text-white font-semibold mt-2"
+              type="submit"
+              disabled={loading}
+            >
               {loading ? "Creating account..." : "Sign Up"}
             </Button>
           </form>
-          <div className="text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Sign in
-            </Link>
+
+          <div className="mt-6 pt-6 border-t text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link href="/login" className="text-accent hover:text-accent/80 font-semibold transition-colors">
+                Sign in here
+              </Link>
+            </p>
           </div>
         </CardContent>
       </Card>
