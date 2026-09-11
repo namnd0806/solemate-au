@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { ErrorCode } from "@/lib/constants/errors";
+import { createAuthenticatedClient } from "@/lib/supabase/auth-helpers";
 
 export interface Profile {
   id: string;
@@ -19,9 +19,9 @@ interface ProfileError {
 }
 
 export class ProfileService {
-  static async getProfile(): Promise<Profile | ProfileError> {
+  static async getProfile(token: string): Promise<Profile | ProfileError> {
     try {
-      const supabase = await createClient();
+      const supabase = createAuthenticatedClient(token);
 
       // Get current user
       const {
@@ -69,12 +69,13 @@ export class ProfileService {
   }
 
   static async updateProfile(
+    token: string,
     firstName?: string,
     lastName?: string,
     phone?: string | null
   ): Promise<Profile | ProfileError> {
     try {
-      const supabase = await createClient();
+      const supabase = createAuthenticatedClient(token);
 
       // Get current user
       const {
